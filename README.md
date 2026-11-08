@@ -11,7 +11,7 @@ npm run preview               # build + serve dist/ on http://localhost:8080
 npm test                      # build + ~840 static checks (npm run test:pages for the GitHub Pages build) (SEO, H1, links, alt, forms, JSON-LD, secrets, JS syntax)
 node scripts/e2e.mjs          # interaction checks in headless Chrome (needs preview running; CHROME=/path/to/chrome)
 npm run build:draft           # → dist-draft/ with orange "DRAFT" notes where content is missing
-npm run images                # re-crop/compress images from source-media/ (Python 3 + Pillow)
+npm run images                # re-crop/compress images from source-media/ (Python 3 + Pillow + numpy)
 ```
 
 Set the real domain before launch: `SITE_URL=https://your-domain.com npm run build` (or `siteUrl` in `src/data/site.json`, or `SITE_URL` env in Netlify). On Netlify with Git/CLI deploys, the build falls back to Netlify's own `URL`. **The prebuilt `dist/` in the zip uses `http://localhost:8080` for canonical/OG/sitemap — rebuild with SITE_URL before a drag-and-drop deploy.**
@@ -60,7 +60,7 @@ Other static hosts work for the pages; forms then need `mode: "function"` on a h
 
 | Piece | Behavior | Without JS |
 |---|---|---|
-| Hero | Still from BarberROME's ALL I KNOW video (wide) / TOP DOWN cover (mobile), slow horizontal drift, letterbox bar, BARBER / ROME wordmark (the only H1). Optional muted loop via `hero.loopVideo`. | Still image |
+| Hero | Graded still of the black 5.0 convertible from BarberROME's “California livin’” video (wide) / SF-cap still from the ALL I KNOW video (mobile), slow horizontal drift, letterbox bar, BARBER / ROME wordmark (the only H1). Optional muted loop via `hero.loopVideo`. | Still image |
 | Lead player | Ready on load, nothing plays until tapped. Tap loads the privacy-enhanced YouTube embed with sound. Waveform pulses + hero contrast lifts only while YouTube reports "playing" (postMessage, no API script). Lead track = `leadTrack` in site.json. | Play links to the track page |
 | Stream | Bottom-sheet chooser (Spotify / Apple Music / Tidal / YouTube / YouTube Music), focus trapped, Esc closes. Each row says where it goes: the track title, or "Artist page" for Spotify/Tidal until track URLs are added. | Jumps to footer links |
 | Join the list | Hero button opens an inline form; full form again right after the track grid; compact form on each track page. Email **or** phone, explicit consent checkbox (email + SMS language), honeypot. | Native POST to Netlify → `/join/thanks/` (email required) |
@@ -82,12 +82,12 @@ src/data/tracks.json    5 tracks: video IDs, Apple links, release dates, credits
 src/assets/             css, js, fonts, img (generated), favicon
 src/partials/analytics.html
 scripts/build.mjs       HTML generator → dist/
-scripts/images.py       crops/compresses source-media/ → src/assets/img/
+scripts/images.py       crops, grades and compresses source-media/frames/ → src/assets/img/
 scripts/test.mjs        static checks      scripts/e2e.mjs  headless-Chrome checks
 scripts/preview.mjs     local server (form POSTs return 501 → site says "Not sent")
 netlify.toml            build, CSP/security headers, caching
 netlify/functions/      optional webhook relay for join/booking
-source-media/           original thumbnails (from the videos listed below)
+source-media/frames/    hand-captured video frames (sources + timestamps listed below)
 preview/                screenshots from headless Chrome
 ```
 
@@ -109,7 +109,22 @@ Artist pages: Spotify https://open.spotify.com/artist/3fEpXcF21tC8AB0KfNWLZl (su
 
 Per-track Spotify and Tidal URLs weren't supplied, so those buttons go to the artist pages and say "artist page". Add a track's `spotify` / `tidal` in `tracks.json` to point it at the track.
 
-Images (YouTube thumbnails from these uploads, cropped in `scripts/images.py`):
-hero wide/OG 4G-7JNXefeg (ALL I KNOW video) · hero mobile + TOP DOWN tile -h9Jb3zs91c · BAY PLAY tile aAporcw0NFE · FUNKY FLOW y18TQdFT898 · PLAYAH WAY ryC7cK5mD_8 · DOMINAMOR e653fXuzv8Y · posters tSmkDrN3A8s, DpbIpMfDxnQ · cards DecpFaNtjew ("The IV experience 💈"), mjeLuNKwtP8 ("TAYLOR & MARKET📍" short), nEKHOoovPcQ (Crenshaw Visuals "Barber Rome - Bay Play"), bNbY8cIzt4I ("ALL I KNOW" live at Noble Studios), 7mh39MPtp_A ("Performing at NorthStar Studio in Vallejo Ca 9/25") · Vallejo/barber still 0ckDgRi7iXw ("IV, Vallejo CA").
+Images (sources and timestamps):
+Every site image is a hand-picked frame (no YouTube thumbnails), letterbox/sidebars trimmed, then cropped and graded by `scripts/images.py` from `source-media/frames/`. Small tags on images that aren't from the song's own video say where the still is from.
 
-User-supplied facts used in copy: from SF, lives in Vallejo, barbering since 12, opened for Rappin' 4-Tay, Instagram @barberrome. No footage of the 4-Tay show turned up, so that card uses the Noble Studios live still and says so in its caption.
+| Slot(s) | Video · timestamp |
+|---|---|
+| hero wide · DOMINAMOR tile + poster | qIjw-tHmnQU “California livin’” @0:12 |
+| TOP DOWN tile · BAY PLAY poster | qIjw-tHmnQU “California livin’” @0:55 |
+| hero mobile · OG · FUNKY FLOW tile | 4G-7JNXefeg ALL I KNOW @1:39 |
+| FUNKY FLOW poster | 4G-7JNXefeg ALL I KNOW @1:21 |
+| TOP DOWN poster · card 03 | DpbIpMfDxnQ TOP DOWN shoot @1:17 |
+| PLAYAH WAY tile | ryC7cK5mD_8 PLAYAH WAY @0:36 |
+| PLAYAH WAY poster · card 05 | ryC7cK5mD_8 PLAYAH WAY @0:20 |
+| BAY PLAY tile (also the hero player cover) · card 02 · footer SF | mjeLuNKwtP8 “TAYLOR & MARKET📍” short @0:20 |
+| card 01 | DecpFaNtjew “The IV experience 💈” @0:44 |
+| Barber strip | 0ckDgRi7iXw “IV, Vallejo CA” @0:22 |
+| footer Vallejo | 0ckDgRi7iXw “IV, Vallejo CA” @0:44 (middle panel) |
+| Rapper strip · card 04 | 7mh39MPtp_A NorthStar Studio, Vallejo @0:24 |
+
+User-supplied facts used in copy: from SF, lives in Vallejo, barbering since 12, opened for Rappin' 4-Tay, Instagram @barberrome. No footage of the 4-Tay show turned up, so that card uses a NorthStar Studio (Vallejo) performance still and its caption says NorthStar.

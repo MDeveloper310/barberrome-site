@@ -80,7 +80,7 @@ function pic(base, widths, alt, { sizes = "100vw", lazy = true, cls = "", w, h, 
   return `<picture><source type="image/webp" srcset="${set("webp")}" sizes="${sizes}"><img src="${B}/assets/img/${base}-${largest}.jpg" srcset="${set("jpg")}" sizes="${sizes}" alt="${esc(alt)}"${cls ? ` class="${cls}"` : ""}${w ? ` width="${w}" height="${h}"` : ""}${lazy ? ' loading="lazy" decoding="async"' : ""}${priority ? ' fetchpriority="high"' : ""}></picture>`;
 }
 const tileWidths = [360, 720];
-const posterWidths = (t) => (t.poster.w === 960 ? [640, 960] : [640]);
+const posterWidths = (t) => (t.poster.w === 1280 ? [640, 960, 1280] : t.poster.w === 960 ? [640, 960] : [640]);
 
 // streaming link list. Per-track Spotify/Tidal URLs aren't supplied yet, so those
 // buttons go to the artist page and say so ("artist page").
@@ -161,7 +161,7 @@ function bookingForm() {
 // ---- layout ------------------------------------------------------------------
 function layout({ pathName, title, description, body, ogImage, ogType = "website", jsonld = [], noindex = false, preload = "", active = "" }) {
   const canonical = abs(pathName);
-  const img = ogImage || { url: "/assets/img/og-barberrome.jpg", w: 1200, h: 630, alt: "BarberRome sitting on the hood of a red convertible in front of a mural wall, cloudy sky overhead." };
+  const img = ogImage || { url: "/assets/img/og-barberrome.jpg", w: 1200, h: 630, alt: "A man in an SF cap, sunglasses and a black track jacket sits above red-tile rooftops, next to the BARBER ROME wordmark." };
   const cfg = {
     formsMode: FORMS, basePath: B, joinFunction: site.forms.joinFunction, bookingFunction: site.forms.bookingFunction,
     rewardUrl: site.reward.url, rewardLabel: site.reward.label, instagramHandle: L.instagramHandle
@@ -241,9 +241,9 @@ function footer() {
       <p class="eyebrow">SF → Vallejo</p>
       <h2>Bay made.</h2>
       <div class="route">
-        <figure>${pic("loc-sf", [320], "A man in a black cap reaches a hand toward the camera at the corner of Taylor and Market in San Francisco, street signs and a traffic light overhead.", { sizes: "40vw", w: 320, h: 400 })}<figcaption>SF<small>Taylor &amp; Market</small></figcaption></figure>
+        <figure>${pic("loc-sf", [320, 540], "A man in a black beanie and a red-and-white jacket stands under the Taylor St and Market St signs in San Francisco, a traffic light and tall old buildings behind him.", { sizes: "40vw", w: 320, h: 400 })}<figcaption>SF<small>Taylor &amp; Market</small></figcaption></figure>
         <span class="route__arrow" aria-hidden="true">→</span>
-        <figure>${pic("loc-vallejo", [320], "A barber in an SF cap and pink shirt trims a young client's hair in a sunlit shop.", { sizes: "40vw", w: 320, h: 400 })}<figcaption>Vallejo<small>In the shop</small></figcaption></figure>
+        <figure>${pic("loc-vallejo", [320], "Close-up of red clippers and a red comb working a client's fade.", { sizes: "40vw", w: 320, h: 400 })}<figcaption>Vallejo<small>In the shop</small></figcaption></figure>
       </div>
       <div class="linkcols">
         <div><h3>Listen</h3><ul>${streamLinks(null, "footer").map((a) => `<li>${a}</li>`).join("")}</ul></div>
@@ -264,7 +264,7 @@ function footer() {
   <div class="wrap legal">
     <span>© ${new Date().getFullYear()} BarberRome</span>
     <a href="${B}/privacy/">Privacy</a>
-    <span>Images: stills from BarberROME's own videos and release covers.</span>
+    <span>Images: stills from BarberROME's own videos.</span>
   </div>
 </footer>`;
 }
@@ -346,24 +346,24 @@ function tile(t, i) {
 }
 
 const CARDS = [
-  { step: "01", h: "The chair", p: "I picked up clippers at 12. Been cutting ever since.", img: "card-chair", widths: [405], alt: "A barber with a tattooed forearm lines up a client's hairline with gold clippers in a bright shop.", cap: "From “The IV experience”" },
-  { step: "02", h: "SF → Vallejo", p: "San Francisco raised me. Vallejo is home now.", img: "card-roots", widths: [400, 640], alt: "A man in a black cap reaches a hand toward the camera at the corner of Taylor and Market in San Francisco, street signs and a traffic light overhead.", cap: "Taylor & Market, SF" },
-  { step: "03", h: "First releases", p: "TOP DOWN came out August 2025. BAY PLAY followed that November.", img: "card-releases", widths: [400, 576], alt: "A man in a white hoodie and black bucket hat stands under pink neon tube lights on a video set.", cap: "BAY PLAY video shoot" },
-  { step: "04", h: "Opened for 4-Tay", p: "I opened for Rappin’ 4-Tay.", img: "card-stage", widths: [400, 568], alt: "A rapper in a red cap and red-and-black jacket performs into a microphone on a red-lit stage.", cap: "Pictured: ALL I KNOW live at Noble Studios" },
-  { step: "05", h: "Now", p: "PLAYAH WAY, FUNKY FLOW, DOMINAMOR. Still cutting. Still recording.", img: "card-now", widths: [400, 640], alt: "Two performers on a small stage: one in a red cap and patterned jacket raps into a mic, the other in a white tee stands at a mic stand.", cap: "NorthStar Studio, Vallejo" }
+  { step: "01", h: "The chair", p: "I picked up clippers at 12. Been cutting ever since.", img: "card-chair", widths: [400, 640], alt: "A barber's tattooed hand, wearing gold and red bracelets, holds a flat black tool to a client's hairline in a shop.", cap: "From “The IV experience”" },
+  { step: "02", h: "SF → Vallejo", p: "San Francisco raised me. Vallejo is home now.", img: "card-roots", widths: [400, 640], alt: "A man in a black beanie and a red-and-white jacket stands under the Taylor St and Market St signs in San Francisco, a traffic light and tall old buildings behind him.", cap: "Taylor & Market, SF" },
+  { step: "03", h: "First releases", p: "TOP DOWN came out August 2025. BAY PLAY followed that November.", img: "card-releases", widths: [400, 640], alt: "A man in a black bucket hat, sunglasses and a puffer jacket stands under angled neon light tubes on a dark video set.", cap: "TOP DOWN video shoot" },
+  { step: "04", h: "Opened for 4-Tay", p: "I opened for Rappin’ 4-Tay.", img: "card-stage", widths: [400, 640], alt: "A performer in a red cap and red jacket raps into a handheld mic on a dim stage at NorthStar Studio in Vallejo.", cap: "Pictured: NorthStar Studio, Vallejo" },
+  { step: "05", h: "Now", p: "PLAYAH WAY, FUNKY FLOW, DOMINAMOR. Still cutting. Still recording.", img: "card-now", widths: [400, 640], alt: "A man in an SF cap and black track jacket talks to the camera outside the Jungle Life studio, its green 1804 sign and painted gorilla behind him.", cap: "PLAYAH WAY video" }
 ];
 
 function home() {
-  const preload = `<link rel="preload" as="image" type="image/webp" media="(max-width: 699px)" imagesrcset="${B}/assets/img/hero-tall-480.webp 480w, ${B}/assets/img/hero-tall-720.webp 720w" imagesizes="100vw">
-<link rel="preload" as="image" type="image/webp" media="(min-width: 700px)" imagesrcset="${B}/assets/img/hero-wide-960.webp 960w, ${B}/assets/img/hero-wide-1280.webp 1280w" imagesizes="100vw">
+  const preload = `<link rel="preload" as="image" type="image/webp" media="(max-width: 699px)" imagesrcset="${B}/assets/img/hero-tall-480.webp 480w, ${B}/assets/img/hero-tall-640.webp 640w" imagesizes="100vw">
+<link rel="preload" as="image" type="image/webp" media="(min-width: 700px)" imagesrcset="${B}/assets/img/hero-wide-960.webp 960w, ${B}/assets/img/hero-wide-1280.webp 1280w, ${B}/assets/img/hero-wide-1920.webp 1920w" imagesizes="100vw">
 `;
   const heroMedia = site.hero.loopVideo
     ? `<video autoplay muted loop playsinline preload="metadata" poster="${B}/assets/img/hero-wide-1280.jpg" aria-hidden="true"><source src="${esc(site.hero.loopVideo)}" type="video/mp4"></video>`
     : `<picture>
-      <source media="(max-width: 699px)" type="image/webp" srcset="${B}/assets/img/hero-tall-480.webp 480w, ${B}/assets/img/hero-tall-720.webp 720w" sizes="100vw">
-      <source media="(max-width: 699px)" srcset="${B}/assets/img/hero-tall-480.jpg 480w, ${B}/assets/img/hero-tall-720.jpg 720w" sizes="100vw">
-      <source type="image/webp" srcset="${B}/assets/img/hero-wide-640.webp 640w, ${B}/assets/img/hero-wide-960.webp 960w, ${B}/assets/img/hero-wide-1280.webp 1280w" sizes="100vw">
-      <img src="${B}/assets/img/hero-wide-1280.jpg" srcset="${B}/assets/img/hero-wide-640.jpg 640w, ${B}/assets/img/hero-wide-960.jpg 960w, ${B}/assets/img/hero-wide-1280.jpg 1280w" sizes="100vw" width="1280" height="720" fetchpriority="high" alt="BarberRome sits on the hood of a red convertible in front of a mural-covered wall while a friend stands by, clouds overhead.">
+      <source media="(max-width: 699px)" type="image/webp" srcset="${B}/assets/img/hero-tall-480.webp 480w, ${B}/assets/img/hero-tall-640.webp 640w" sizes="100vw">
+      <source media="(max-width: 699px)" srcset="${B}/assets/img/hero-tall-480.jpg 480w, ${B}/assets/img/hero-tall-640.jpg 640w" sizes="100vw">
+      <source type="image/webp" srcset="${B}/assets/img/hero-wide-640.webp 640w, ${B}/assets/img/hero-wide-960.webp 960w, ${B}/assets/img/hero-wide-1280.webp 1280w, ${B}/assets/img/hero-wide-1920.webp 1920w" sizes="100vw">
+      <img src="${B}/assets/img/hero-wide-1280.jpg" srcset="${B}/assets/img/hero-wide-640.jpg 640w, ${B}/assets/img/hero-wide-960.jpg 960w, ${B}/assets/img/hero-wide-1280.jpg 1280w, ${B}/assets/img/hero-wide-1920.jpg 1920w" sizes="100vw" width="1280" height="720" fetchpriority="high" alt="A black Mustang 5.0 convertible with a red top and gold wire wheels parked by a sunny park.">
     </picture>`;
   const body = `
 <section class="hero" aria-labelledby="h1">
@@ -392,11 +392,11 @@ function home() {
 
 <section class="dual" aria-label="Barber and rapper">
   <div class="dual__item dual__item--chair">
-    ${pic("id-chair", [405], "A barber in an SF cap and pink shirt trims a young client's hair in a sunlit shop.", { sizes: "(min-width:800px) 21vw, 50vw", w: 405, h: 506, lazy: false })}
+    ${pic("id-chair", [405, 640], "A barber in an SF cap and pink shirt fades a client's hair with red clippers in a sunlit shop.", { sizes: "(min-width:800px) 21vw, 50vw", w: 405, h: 506, lazy: false })}
     <div class="dual__txt"><p class="eyebrow">The chair</p><h2>Barber</h2><p>Cutting hair since I was 12. Still in the shop.</p></div>
   </div>
   <div class="dual__item">
-    ${pic("card-stage", [400], "A rapper in a red cap and red-and-black jacket performs into a microphone on a red-lit stage.", { sizes: "(min-width:800px) 21vw, 50vw", w: 400, h: 500, lazy: false })}
+    ${pic("card-stage", [400, 640], "A performer in a red cap and red jacket raps into a handheld mic on a dim stage at NorthStar Studio in Vallejo.", { sizes: "(min-width:800px) 21vw, 50vw", w: 400, h: 500, lazy: false })}
     <div class="dual__txt"><p class="eyebrow">The mic</p><h2>Rapper</h2><p>Bay player music. ${tracks.slice(0, 3).map((t) => esc(t.title)).join(", ")} out now.</p></div>
   </div>
 </section>
@@ -529,7 +529,14 @@ const notFound = layout({ pathName: "/404.html", title: "Not found | BarberRome"
 
 // ---- write -------------------------------------------------------------------
 fs.rmSync(OUT, { recursive: true, force: true });
-const write = (rel, content) => { const p = path.join(OUT, rel); fs.mkdirSync(path.dirname(p), { recursive: true }); fs.writeFileSync(p, content); };
+// cache-bust images: every /assets/img/<file> reference in HTML gets ?v=<content hash>, so replaced photos
+// with the same file name are re-fetched instead of served from a stale browser/CDN cache.
+const IMG_V = new Map();
+const imgV = (html) => html.replace(/\/assets\/img\/([A-Za-z0-9._-]+\.(?:jpg|webp|png))(?![?\w.])/g, (m, f) => {
+  if (!IMG_V.has(f)) IMG_V.set(f, hashFile(`assets/img/${f}`));
+  return `/assets/img/${f}?v=${IMG_V.get(f)}`;
+});
+const write = (rel, content) => { const p = path.join(OUT, rel); fs.mkdirSync(path.dirname(p), { recursive: true }); fs.writeFileSync(p, rel.endsWith(".html") ? imgV(content) : content); };
 fs.cpSync(path.join(SRC, "assets"), path.join(OUT, "assets"), { recursive: true });
 write("index.html", home());
 tracks.forEach((t, i) => write(`tracks/${t.slug}/index.html`, trackPage(t, i)));

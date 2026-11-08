@@ -2,6 +2,7 @@
 // Static checks on dist/: SEO tags, one H1, heading order, alt text, internal links,
 // JSON-LD validity, forms wiring, sitemap/robots, JS syntax, no secrets.
 import fs from "node:fs";
+import crypto from "node:crypto";
 import path from "node:path";
 import { execFileSync } from "node:child_process";
 import { fileURLToPath } from "node:url";
@@ -148,11 +149,26 @@ for (const f of [...walk(path.join(ROOT, "src")), ...walk(path.join(ROOT, "scrip
   ok(!SECRET.test(fs.readFileSync(f, "utf8")), `secret-like string in ${path.relative(ROOT, f)}`);
 }
 
+// image cache-busting: every image reference carries ?v=<first 8 hex of sha1(file)>
+{
+  const sha = (f) => crypto.createHash("sha1").update(fs.readFileSync(f)).digest("hex").slice(0, 8);
+  let refs = 0, bad = [];
+  for (const f of pages) {
+    const html = fs.readFileSync(f, "utf8");
+    for (const m of html.matchAll(/\/assets\/img\/([A-Za-z0-9._-]+\.(?:jpg|webp|png))(\?v=([0-9a-f]{8}))?/g)) {
+      refs++;
+      const file = path.join(DIST, "assets/img", m[1]);
+      if (!m[3] || !fs.existsSync(file) || sha(file) !== m[3]) bad.push(`${path.relative(DIST, f)}: ${m[0]}`);
+    }
+  }
+  ok(refs > 0 && bad.length === 0, `all ${refs} image refs are versioned with their content hash` + (bad.length ? ` — bad: ${bad.slice(0, 5).join(", ")}` : ""));
+}
+
 // page weight budget
 const kb = (f) => fs.statSync(f).size / 1024;
 ok(kb(path.join(DIST, "assets/js/site.js")) < 20, "site.js < 20 KB");
 ok(kb(path.join(DIST, "assets/css/site.css")) < 40, "site.css < 40 KB");
-const heroW = kb(path.join(DIST, "assets/img/hero-tall-720.webp"));
+const heroW = kb(path.join(DIST, "assets/img/hero-tall-640.webp"));
 ok(heroW < 120, `hero mobile webp < 120 KB (${heroW.toFixed(0)} KB)`);
 
 console.log(`\n${passes} checks passed, ${fails} failed.`);

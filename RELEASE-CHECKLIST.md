@@ -20,14 +20,14 @@ Done: Spotify, Apple Music and Tidal artist links supplied by the owner and wire
 - [ ] Shop name/address (`contact.shopName`). Booking email is set: iv.forthepeople@gmail.com.
 - [ ] Optional per-track **Spotify / Tidal URLs** (`spotify`, `tidal` in `tracks.json`). Until then those buttons open the artist pages and are labeled "artist page".
 - [ ] Optional **muted hero loop**: 6–10 s top-down cruise clip, H.264 MP4 under 1.5 MB, `hero.loopVideo`.
-- [ ] Optional **Rappin' 4-Tay show** still/date. The card uses the Noble Studios live still and says so in its caption.
+- [ ] Optional **Rappin' 4-Tay show** still/date. The card uses a NorthStar Studio (Vallejo) performance still and its caption says NorthStar.
 - [ ] Optional: add ALL I KNOW / 14 MI$$ON as tiles (both verified on Apple + YouTube) — copy an entry in `tracks.json`, add images in `scripts/images.py`.
 
 ## Confirm image use
 - [ ] The barbershop stills (from "The IV experience 💈" and "IV, Vallejo CA") show barbers at work; confirm who's pictured and that the clients are OK being on the site.
 - [ ] DOMINAMOR cover shows a child — confirm OK as a tile.
 - [ ] Card 03 uses a still from the Crenshaw Visuals upload (nEKHOoovPcQ); confirm with the videographer, or swap for a BarberROME-channel still.
-- [ ] Better sources: the stills come from YouTube thumbnails (720p max). Original 1080p+ frame grabs from the TOP DOWN / BAY PLAY / ALL I KNOW footage will look sharper. Drop them in `source-media/`, adjust crops in `scripts/images.py`, run `npm run images`.
+- [x] Image sources: every image is now a hand-captured video frame (1080p; PLAYAH WAY 720p; vertical shorts 675×1200), graded in `scripts/images.py`. Optional: original camera files or a BAY PLAY / DOMINAMOR-specific still would beat the stand-ins (tagged with their source). Drop them in `source-media/frames/`, add a job in `scripts/images.py`, run `npm run images`.
 - [ ] Instagram @barberrome: the handle came from the owner; check it's the right account.
 
 ## Nice to have

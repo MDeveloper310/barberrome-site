@@ -29,12 +29,12 @@
     "hook": null,
     "tile": {
       "img": "tile-bay-play",
-      "alt": "A man in an orange San Francisco jersey pulls a black hood down over his face in a narrow alley covered in graffiti."
+      "alt": "A man in a black beanie and a red-and-white jacket stands under the Taylor St and Market St signs in San Francisco (still from BarberROME's “TAYLOR & MARKET” short, not the BAY PLAY video)."
     },
     "poster": {
       "img": "poster-bay-play",
-      "w": 640,
-      "alt": "A man in a white hoodie and black bucket hat poses under pink neon tube lights during the BAY PLAY video shoot."
+      "w": 1280,
+      "alt": "A man in a black Old English-lettered cap drives a convertible with the top down and red leather seats (still from the “California livin’” video)."
     }
   },
   {
@@ -57,12 +57,12 @@
     "hook": null,
     "tile": {
       "img": "tile-top-down",
-      "alt": "A man in a red cap crouches beside a black classic convertible on gold wire wheels, palm trees and a blue sky behind him."
+      "alt": "A man in a black Old English-lettered cap and puffer jacket sits behind the wheel of a convertible with the top down and red leather seats."
     },
     "poster": {
       "img": "poster-top-down",
-      "w": 640,
-      "alt": "A man in a black bucket hat and sunglasses gestures in front of angled neon light strips during the TOP DOWN video shoot."
+      "w": 1280,
+      "alt": "A man in a black bucket hat and puffer jacket stands under angled neon light tubes during the TOP DOWN video shoot."
     }
   },
   {
@@ -85,12 +85,12 @@
     "hook": null,
     "tile": {
       "img": "tile-funky-flow",
-      "alt": "A man in a green track jacket kneels over hand-drawn lettering sketches on the floor, with stacked speakers, a MISSION sign and a small TV marked IV behind him."
+      "alt": "A man in an SF cap, sunglasses and a black track jacket sits above red-tile rooftops under a cloudy sky (still from the ALL I KNOW video)."
     },
     "poster": {
       "img": "poster-funky-flow",
-      "w": 960,
-      "alt": "FUNKY FLOW cover: a man kneels over lettering sketches beside a MISSION sign and old speakers."
+      "w": 1280,
+      "alt": "A man in a light cap and black track jacket gestures out over red-tile rooftops under a cloudy sky (still from the ALL I KNOW video)."
     }
   },
   {
@@ -111,12 +111,12 @@
     "hook": null,
     "tile": {
       "img": "tile-playah-way",
-      "alt": "A man in an SF cap and black track jacket points down the block, laughing, in front of a mural wall with a painted gorilla."
+      "alt": "A man in an SF cap and black track jacket grins and tugs his collar in front of a mural wall, a friend behind him."
     },
     "poster": {
       "img": "poster-playah-way",
-      "w": 960,
-      "alt": "A man in an SF cap points down a street lined with murals while a friend stands behind him in the PLAYAH WAY video."
+      "w": 1280,
+      "alt": "A man in an SF cap and black track jacket stands with a friend outside the Jungle Life studio, beside a mural wall and a painted gorilla sign, in the PLAYAH WAY video."
     }
   },
   {
@@ -137,12 +137,12 @@
     "hook": null,
     "tile": {
       "img": "tile-dominamor",
-      "alt": "Seen from behind, a man in a black I-80 BarberRome shirt and red pants carries a child dressed in red on his shoulders down a brick path."
+      "alt": "Side of a black Mustang 5.0 convertible with a red top and a gold-centered wire wheel (still from the “California livin’” video)."
     },
     "poster": {
       "img": "poster-dominamor",
-      "w": 960,
-      "alt": "DOMINAMOR cover: a man in a BarberRome I-80 shirt carries a child dressed in red on his shoulders."
+      "w": 1280,
+      "alt": "Front of a black Mustang convertible with a red top and gold wire wheels parked by a park (still from the “California livin’” video)."
     }
   }
 ]
