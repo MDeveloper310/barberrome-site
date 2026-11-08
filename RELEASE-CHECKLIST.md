@@ -9,7 +9,7 @@ Lyrics and hook lines are out for now at the owner's request; they are not a lau
 The site is live on GitHub Pages (https://mdeveloper310.github.io/barberrome-site/) with signups and booking switched off there. Items below are what's left for a full launch.
 
 - [ ] **Domain.** Set `SITE_URL` (Netlify env) or `siteUrl` in `src/data/site.json`. Until then canonical/OG/sitemap use the fallback host. Rebuild after.
-- [ ] **Forms backend.** On GitHub Pages forms are disabled (Instagram fallback). To collect signups/bookings: Deploy on Netlify (forms are auto-detected) and turn on form notifications, **or** switch `forms.mode` to `function` and set `SUBSCRIBE_WEBHOOK_URL` / `BOOKING_WEBHOOK_URL`. Send a real test submission from the live site.
+- [ ] **Forms backend.** On GitHub Pages forms are disabled (email + Instagram buttons, nothing collected). Fastest path: activate the prepared FormSubmit mode — README "Email forwarding (FormSubmit)" — which needs the owner of iv.forthepeople@gmail.com to click FormSubmit's activation email after one live test submission. Other options: Deploy on Netlify (forms are auto-detected) and turn on form notifications, **or** switch `forms.mode` to `function` and set `SUBSCRIBE_WEBHOOK_URL` / `BOOKING_WEBHOOK_URL`. Send a real test submission from the live site.
 - [ ] **Email/SMS list.** Decide where contacts end up (Laylo, Mailchimp, Community, a sheet). If you text people, use an SMS provider that handles STOP/HELP and consent records. The checkbox wording is on the forms and in `/privacy/`.
 - [ ] **Unreleased reward.** `reward.url` is null. Upload the unreleased cut / shop voice note somewhere private (unlisted SoundCloud, Dropbox link, a hidden page) and set `reward.url`. Until then the thank-you message says it isn't posted yet. Note: a URL shown on the thank-you page can be shared; for a gated file, email it from your list tool instead.
 - [ ] **Artist sign-off on the first-person copy**: hero line, "Barber / Rapper" strip, Chair to Mic cards, join/booking lines (all in `scripts/build.mjs`, `CARDS` and `home()`).
@@ -17,7 +17,7 @@ The site is live on GitHub Pages (https://mdeveloper310.github.io/barberrome-sit
 Done: Spotify, Apple Music and Tidal artist links supplied by the owner and wired into the chooser, track pages, grid, footer and schema.
 
 ## Content not supplied yet (kept out, not faked)
-- [ ] **Booking email** (`contact.email`) and shop name/address (`contact.shopName`). Until then: booking form + Instagram DM.
+- [ ] Shop name/address (`contact.shopName`). Booking email is set: iv.forthepeople@gmail.com.
 - [ ] Optional per-track **Spotify / Tidal URLs** (`spotify`, `tidal` in `tracks.json`). Until then those buttons open the artist pages and are labeled "artist page".
 - [ ] Optional **muted hero loop**: 6–10 s top-down cruise clip, H.264 MP4 under 1.5 MB, `hero.loopVideo`.
 - [ ] Optional **Rappin' 4-Tay show** still/date. The card uses the Noble Studios live still and says so in its caption.

@@ -23,6 +23,28 @@ const B = new URL(SITE_URL).pathname.replace(/\/+$/, ""); // base path, e.g. "/b
 // Forms: "netlify" (default) | "function" | "disabled" (static hosts with no backend, e.g. GitHub Pages)
 const FORMS = process.env.FORMS_MODE || site.forms.mode;
 const FORMS_ON = FORMS !== "disabled";
+const FS = FORMS === "formsubmit";
+if (process.env.FORMSUBMIT_ENDPOINT) site.forms.formsubmitEndpoint = process.env.FORMSUBMIT_ENDPOINT;
+if (FS && !site.forms.formsubmitEndpoint) throw new Error("FORMS_MODE=formsubmit needs forms.formsubmitEndpoint in site.json");
+// Per-host form wiring. Field names (email, phone, consent, name, …) are the same everywhere.
+function formWiring(name, subject) {
+  const next = abs(`/${name === "join" ? "join" : "booking"}/thanks/`);
+  if (FS) return {
+    attrs: `method="POST" action="${esc(site.forms.formsubmitEndpoint)}"`,
+    hidden: `<input type="hidden" name="_subject" value="${esc(subject)}">
+  <input type="hidden" name="_next" value="${esc(next)}">
+  <input type="hidden" name="_template" value="table">
+  <input type="hidden" name="form" value="${name}">
+  <p class="hp"><label>Leave this empty <input name="_honey" tabindex="-1" autocomplete="off"></label></p>`,
+    note: `<p class="small muted" style="margin:0">Sent by email through FormSubmit (formsubmit.co). <a href="${B}/privacy/">Privacy</a></p>`
+  };
+  return {
+    attrs: `method="POST" action="${B}/${name === "join" ? "join" : "booking"}/thanks/" data-netlify="true" netlify-honeypot="bot-field"`,
+    hidden: `<input type="hidden" name="form-name" value="${name}">
+  <p class="hp"><label>Leave this empty <input name="bot-field" tabindex="-1" autocomplete="off"></label></p>`,
+    note: ""
+  };
+}
 
 // ---- helpers ----------------------------------------------------------------
 const esc = (s = "") => String(s).replace(/[&<>"']/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]));
@@ -100,15 +122,16 @@ function formsOff(kind) {
 
 function joinForm(placement, { compact = false, idp = placement } = {}) {
   if (!FORMS_ON) return formsOff("join");
-  return `<form class="form${compact ? " form--card" : ""}" name="join" method="POST" action="${B}/join/thanks/" data-netlify="true" netlify-honeypot="bot-field" data-form="join" aria-label="Join the BarberRome list">
-  <input type="hidden" name="form-name" value="join">
+  const w = formWiring("join", "BarberRome list signup");
+  return `<form class="form${compact ? " form--card" : ""}" name="join" ${w.attrs} data-form="join" aria-label="Join the BarberRome list">
+  ${w.hidden}
   <input type="hidden" name="placement" value="${esc(placement)}">
-  <p class="hp"><label>Leave this empty <input name="bot-field" tabindex="-1" autocomplete="off"></label></p>
   <div class="row2">
     <div class="field"><label for="${idp}-email">Email</label><input id="${idp}-email" type="email" name="email" autocomplete="email" inputmode="email" placeholder="you@email.com" required></div>
     <div class="field"><label for="${idp}-phone">Phone <span class="muted">(for texts)</span></label><input id="${idp}-phone" type="tel" name="phone" autocomplete="tel" inputmode="tel" placeholder="(707) 555-0123"></div>
   </div>
   <label class="check"><input type="checkbox" name="consent" value="yes" required> <span>Yes — send me BarberRome updates by email, and by text if I added a number. Msg &amp; data rates may apply. Reply STOP to stop texts, unsubscribe any time. <a href="${B}/privacy/">Privacy</a></span></label>
+  ${w.note}
   <button class="btn btn--solid-gold" type="submit">Join the list</button>
   <p class="status small" data-status role="status" aria-live="polite"></p>
 </form>`;
@@ -116,9 +139,9 @@ function joinForm(placement, { compact = false, idp = placement } = {}) {
 
 function bookingForm() {
   if (!FORMS_ON) return formsOff("booking");
-  return `<form class="form form--card" name="booking" method="POST" action="${B}/booking/thanks/" data-netlify="true" netlify-honeypot="bot-field" data-form="booking" aria-label="Booking inquiry">
-  <input type="hidden" name="form-name" value="booking">
-  <p class="hp"><label>Leave this empty <input name="bot-field" tabindex="-1" autocomplete="off"></label></p>
+  const w = formWiring("booking", "BarberRome booking inquiry");
+  return `<form class="form form--card" name="booking" ${w.attrs} data-form="booking" aria-label="Booking inquiry">
+  ${w.hidden}
   <div class="row2">
     <div class="field"><label for="bk-name">Name</label><input id="bk-name" name="name" autocomplete="name" required></div>
     <div class="field"><label for="bk-type">What for</label><select id="bk-type" name="inquiry" required><option value="">Pick one</option><option>Show / performance</option><option>Feature or studio session</option><option>Haircut</option><option>Press / interview</option><option>Other</option></select></div>
@@ -129,6 +152,7 @@ function bookingForm() {
   </div>
   <div class="field"><label for="bk-date">Date <span class="muted">(if there is one)</span></label><input id="bk-date" type="date" name="date"></div>
   <div class="field"><label for="bk-msg">Details</label><textarea id="bk-msg" name="message" required placeholder="Where, when, what you need."></textarea></div>
+  ${w.note}
   <button class="btn" type="submit">Send inquiry</button>
   <p class="status small" data-status role="status" aria-live="polite"></p>
 </form>`;
@@ -497,6 +521,7 @@ ${FORMS_ON ? "" : "<p><strong>Right now this site doesn’t collect anything:</s
 <p>If you join the list, I keep your email and/or phone number to send you BarberRome music, show news and the unreleased drop. That’s it. I don’t sell it.</p>
 <h2>Texts</h2><p>If you add a number and check the box, you agree to get texts from BarberRome. Message frequency varies. Msg &amp; data rates may apply. Reply STOP to stop, HELP for help.</p>
 <h2>Booking</h2><p>Booking inquiries are only used to answer you.</p>
+${FS ? "<h2>Form service</h2><p>Signup and booking forms are delivered by email through FormSubmit (formsubmit.co), a third-party service that handles the submission and may show a spam check. Their privacy policy applies to that step.</p>" : ""}
 <h2>Removal</h2><p>To get removed, reply STOP to a text, use the unsubscribe link in any email, or DM <a href="${esc(L.instagram)}">${esc(L.instagramHandle)}</a>.</p>
 <h2>Videos</h2><p>Videos play through YouTube’s privacy-enhanced embed and only load after you tap play.</p>`);
 const notFound = layout({ pathName: "/404.html", title: "Not found | BarberRome", description: site.description, noindex: true,

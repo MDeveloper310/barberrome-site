@@ -36,9 +36,11 @@
   },
   "forms": {
     "mode": "netlify",
-    "_modes": "netlify = Netlify Forms (default, no server code). function = POST JSON to /.netlify/functions/subscribe which relays to SUBSCRIBE_WEBHOOK_URL / BOOKING_WEBHOOK_URL.",
+    "_modes": "netlify = Netlify Forms (default). function = POST JSON to the Netlify functions relay. formsubmit = native POST to FormSubmit (formsubmit.co), which emails each submission; needs formsubmitEndpoint + one-time activation by the inbox owner. disabled = no forms (GitHub Pages default).",
     "joinFunction": "/.netlify/functions/subscribe",
-    "bookingFunction": "/.netlify/functions/booking"
+    "bookingFunction": "/.netlify/functions/booking",
+    "formsubmitEndpoint": null,
+    "_formsubmitNote": "PENDING ACTIVATION — not live. Set to https://formsubmit.co/iv.forthepeople@gmail.com (or, after activation, the random-string alias FormSubmit emails you) and build with FORMS_MODE=formsubmit. See README 'Email forwarding (FormSubmit)'."
   },
   "contact": {
     "email": "iv.forthepeople@gmail.com",

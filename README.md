@@ -27,6 +27,26 @@ Live: **https://mdeveloper310.github.io/barberrome-site/** (project site, base p
 - Local preview of the Pages build: `npm run build:pages && OUT_DIR=dist BASE_PATH=/barberrome-site PORT=8081 node scripts/preview.mjs` → http://localhost:8081/barberrome-site/ ; tests: `npm run test:pages`, and `BASE=http://localhost:8081/barberrome-site FORMS_MODE=disabled node scripts/e2e.mjs`.
 - Custom domain later: set it in repo Settings → Pages, then the workflow's `base_url` becomes the domain and the base path drops to empty automatically.
 
+## Email forwarding (FormSubmit) — prepared, NOT active
+
+Goal: signup + booking submissions emailed to **iv.forthepeople@gmail.com** from the GitHub Pages site, no server and no account. FormSubmit (https://formsubmit.co, docs https://formsubmit.co/documentation) does this with a plain HTML form `action`. The code is ready; it is off until the inbox owner activates it.
+
+What the `formsubmit` mode does (`FORMS_MODE=formsubmit` + `forms.formsubmitEndpoint`):
+- Forms POST natively to the endpoint (no AJAX, so FormSubmit's reCAPTCHA spam check stays on), with `_subject`, `_template=table`, a `_honey` honeypot, and `_next` = this site's `/join/thanks/` or `/booking/thanks/` (full URL, as FormSubmit requires). JS only validates (email-or-phone, consent) before letting the browser submit.
+- Each form says "Sent by email through FormSubmit (formsubmit.co)", and `/privacy/` gets a third-party note.
+- Thank-you pages are built again; the join one still says the unreleased drop isn't posted yet unless `reward.url` is set.
+
+Activation (needs the owner, one time):
+1. Set `forms.formsubmitEndpoint` to `https://formsubmit.co/iv.forthepeople@gmail.com` in `src/data/site.json`, and change `FORMS_MODE: disabled` to `FORMS_MODE: formsubmit` in `.github/workflows/pages.yml`. Push.
+2. Submit either form once on the live site. FormSubmit then emails **iv.forthepeople@gmail.com** an activation link; click it (check spam). Until that click nothing is forwarded (FormSubmit holds submissions up to 30 days and delivers them after confirming).
+3. Optional: the activation email includes a random-string alias. Swap it into `formsubmitEndpoint` so the raw address isn't in the HTML (it's already public via the mailto buttons, so this is just spam hygiene).
+4. Send one real test from the live site and check it arrives.
+
+Limits: free tier, third-party processing, reCAPTCHA page between submit and thank-you, no list management (it's email notifications, not a mailing list). For a real list later, point the forms at a list tool (Laylo, Mailchimp, etc.) or use Netlify + the functions relay.
+
+Tests never submit in this mode (`scripts/e2e.mjs` only checks wiring), because any POST to FormSubmit sends real mail.
+To check the build locally: `SITE_URL=https://mdeveloper310.github.io/barberrome-site FORMS_MODE=formsubmit FORMSUBMIT_ENDPOINT=https://formsubmit.co/iv.forthepeople@gmail.com npm test`.
+
 ## Deploy (Netlify — for working forms)
 
 1. Push this folder to a Git repo, or `netlify deploy` with the CLI. Build command and publish dir come from `netlify.toml`.

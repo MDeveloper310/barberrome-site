@@ -76,10 +76,15 @@ if (!FORMS_ON) {
   ok(await ev("/aren’t open/.test(document.getElementById('hero-join').textContent) && !!document.querySelector('#hero-join a[href*=\"instagram.com/barberrome\"]')"), "forms disabled: honest notice + Instagram link in hero");
   ok(await ev("!/I’ll send you/.test(document.body.textContent)"), "forms disabled: no reward promise");
 } else {
+if (process.env.FORMS_MODE === "formsubmit") {
+  // Never submit here: a FormSubmit POST sends real email / activation mail.
+  ok(await ev("[...document.querySelectorAll('form')].every(f=>f.action.startsWith('https://formsubmit.co/') && f.querySelector('[name=_honey]') && f.querySelector('[name=_next]').value.endsWith('/thanks/'))"), "FormSubmit wiring on every form (not submitted)");
+} else {
 const status = await ev(`(async()=>{const f=document.querySelector('#hero-join form');f.querySelector('[name=email]').value='test@example.com';f.querySelector('[name=email]').dispatchEvent(new Event('input'));f.querySelector('[name=consent]').checked=true;f.requestSubmit();await new Promise(r=>setTimeout(r,800));return f.querySelector('[data-status]').textContent})()`);
 ok(/Not sent/.test(status || ""), `local submit reports honestly: "${status}"`);
 if (!/Not sent/.test(status || "")) console.log(await ev(`JSON.stringify([...document.querySelectorAll('#hero-join form [name]')].map(i=>[i.name,i.validationMessage,i.value]))`));
 ok(await ev("dataLayer.some(e=>e.event==='join_submit'&&e.result==='error')"), "join_submit error event tracked");
+}
 const v = await ev(`(()=>{const f=document.querySelector('#join form');f.querySelector('[name=email]').value='';f.querySelector('[name=phone]').value='';f.querySelector('[name=email]').dispatchEvent(new Event('input'));return f.checkValidity()})()`);
 ok(v === false, "join form requires email or phone");
 const v2 = await ev(`(()=>{const f=document.querySelector('#join form');f.querySelector('[name=phone]').value='707 555 0123';f.querySelector('[name=phone]').dispatchEvent(new Event('input'));f.querySelector('[name=consent]').checked=true;return f.checkValidity()})()`);
@@ -101,7 +106,7 @@ await send("Emulation.setScriptExecutionDisabled", { value: false });
 ok(await ev("document.querySelector('[data-expand]').hidden===true"), "no-JS: expand buttons stay hidden");
 ok(await ev("new URL(document.querySelector('.tile__title a').href).pathname.includes('/tracks/')"), "no-JS: tiles link to track pages");
 ok(await ev("document.querySelector('.ctas [data-stream-open]').getAttribute('href').endsWith('#listen')"), "no-JS: Stream falls back to #listen links");
-if (FORMS_ON) ok(await ev("document.querySelector('#join form').getAttribute('action').endsWith('/join/thanks/') && document.querySelector('#join form [name=email]').required"), "no-JS: join form posts natively with email required");
+if (FORMS_ON) ok(await ev("(" + (process.env.FORMS_MODE === "formsubmit" ? "document.querySelector('#join form').action.startsWith('https://formsubmit.co/')" : "document.querySelector('#join form').getAttribute('action').endsWith('/join/thanks/')") + ") && document.querySelector('#join form [name=email]').required"), "no-JS: join form posts natively with email required");
 else ok(await ev("document.querySelectorAll('form').length===0 && !!document.querySelector('[data-forms-off=join] a[href*=\"instagram\"]')"), "no-JS: no forms, Instagram fallback visible");
 
 // desktop

@@ -10,6 +10,7 @@ const DIST = path.join(ROOT, process.env.OUT_DIR || "dist");
 const SITE_URL = (process.env.SITE_URL || "http://localhost:8080").replace(/\/+$/, "");
 const BASE = new URL(SITE_URL).pathname.replace(/\/+$/, "");   // "" or e.g. "/barberrome-site"
 const FORMS_ON = (process.env.FORMS_MODE || "netlify") !== "disabled";
+const FS = process.env.FORMS_MODE === "formsubmit";
 const site = JSON.parse(fs.readFileSync(path.join(ROOT, "src/data/site.json"), "utf8"));
 let fails = 0, passes = 0;
 const ok = (cond, msg) => { if (cond) passes++; else { fails++; console.error("✗ " + msg); } };
@@ -66,11 +67,18 @@ for (const f of pages) {
   }
   // forms
   for (const form of body.match(/<form\b[^>]*>[\s\S]*?<\/form>/g) || []) {
-    ok(/data-netlify="true"/.test(form) && /netlify-honeypot="bot-field"/.test(form) && /name="bot-field"/.test(form), `${rel}: form missing Netlify/honeypot wiring`);
     const name = attr(form.match(/<form\b[^>]*>/)[0], "name");
-    ok(form.includes(`name="form-name" value="${name}"`), `${rel}: form-name hidden input for ${name}`);
     const action = attr(form.match(/<form\b[^>]*>/)[0], "action");
-    ok(action && resolveLocal(action), `${rel}: form action ${action} has no page`);
+    if (FS) {
+      ok(/^https:\/\/formsubmit\.co\//.test(action) && /name="_honey"/.test(form) && /formsubmit\.co/.test(form.replace(/action="[^"]*"/, "")), `${rel}: FormSubmit action, _honey and disclosure`);
+      const next = (form.match(/name="_next" value="([^"]+)"/) || [])[1];
+      ok(next && next.startsWith(SITE_URL + "/") && resolveLocal(new URL(next).pathname), `${rel}: _next points at a built thank-you page (${next})`);
+      ok(!/data-netlify/.test(form), `${rel}: no Netlify attrs in FormSubmit mode`);
+    } else {
+      ok(/data-netlify="true"/.test(form) && /netlify-honeypot="bot-field"/.test(form) && /name="bot-field"/.test(form), `${rel}: form missing Netlify/honeypot wiring`);
+      ok(form.includes(`name="form-name" value="${name}"`), `${rel}: form-name hidden input for ${name}`);
+      ok(action && resolveLocal(action), `${rel}: form action ${action} has no page`);
+    }
     if (name === "join") ok(/name="consent"[^>]*required/.test(form), `${rel}: join form needs explicit consent checkbox`);
   }
   ok(html.includes(`<link rel="canonical" href="${SITE_URL}/`), `${rel}: canonical uses SITE_URL ${SITE_URL}`);

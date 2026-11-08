@@ -226,8 +226,14 @@
       ["input", "change"].forEach(function (ev) { email.addEventListener(ev, check); phone.addEventListener(ev, check); }); check();
     }
     form.addEventListener("submit", function (e) {
-      e.preventDefault();
       check();
+      if ((CFG.formsMode || "netlify") === "formsubmit") {
+        // Native POST to FormSubmit (spam check + redirect to our thank-you page). Validate only.
+        if (!form.reportValidity()) { e.preventDefault(); return; }
+        track(kind + "_submit", { result: "sent_to_formsubmit", placement: form.querySelector("[name=placement]") ? form.querySelector("[name=placement]").value : undefined });
+        return;
+      }
+      e.preventDefault();
       if (!form.reportValidity()) return;
       var btn = form.querySelector("button[type=submit]");
       var fd = new FormData(form);
