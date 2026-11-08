@@ -1,0 +1,52 @@
+{
+  "_comment": "Site-wide config. Anything null is intentionally unset — see RELEASE-CHECKLIST.md. SITE_URL env var (or Netlify's URL) overrides siteUrl at build time.",
+  "siteUrl": null,
+  "artistName": "BarberRome",
+  "alternateNames": [
+    "BarberROME",
+    "Barber Rome",
+    "barberrome"
+  ],
+  "title": "BarberRome | Bay Area Rapper | Vallejo & San Francisco",
+  "description": "BarberRome is a Bay Area rapper from San Francisco living in Vallejo. Stream BAY PLAY, TOP DOWN, Funky Flow and more. Barber and rapper.",
+  "genre": [
+    "Hip-hop",
+    "Bay Area hip-hop"
+  ],
+  "leadTrack": "bay-play",
+  "links": {
+    "instagram": "https://www.instagram.com/barberrome/",
+    "instagramHandle": "@barberrome",
+    "spotify": "https://open.spotify.com/artist/3fEpXcF21tC8AB0KfNWLZl",
+    "appleMusic": "https://music.apple.com/us/artist/barberrome/1876771221",
+    "tidal": "https://tidal.com/artist/74383223/u",
+    "youtube": "https://www.youtube.com/@BarberROME33",
+    "youtubeMusic": "https://music.youtube.com/channel/UCWTQZqYw6VHZqHaGUMA9HEQ"
+  },
+  "hero": {
+    "loopVideo": null,
+    "loopVideoNote": "Optional: path to a 6–10s muted MP4 (H.264, <1.5 MB) cut from cruise footage, e.g. /assets/video/hero-loop.mp4",
+    "stillCaption": "Still from the ALL I KNOW video",
+    "stillCaptionMobile": "TOP DOWN cover"
+  },
+  "reward": {
+    "label": "an unreleased cut or a voice note from the shop",
+    "url": null,
+    "_note": "Set url to the private file/page once it exists. Until then the thank-you page says it isn't posted yet."
+  },
+  "forms": {
+    "mode": "netlify",
+    "_modes": "netlify = Netlify Forms (default, no server code). function = POST JSON to /.netlify/functions/subscribe which relays to SUBSCRIBE_WEBHOOK_URL / BOOKING_WEBHOOK_URL.",
+    "joinFunction": "/.netlify/functions/subscribe",
+    "bookingFunction": "/.netlify/functions/booking"
+  },
+  "contact": {
+    "email": null,
+    "shopName": null,
+    "shopCity": "Vallejo, CA"
+  },
+  "analytics": {
+    "provider": null,
+    "_note": "Events always go to window.dataLayer. Paste a provider snippet into src/partials/analytics.html if you want one."
+  }
+}

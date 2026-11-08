@@ -1,0 +1,148 @@
+[
+  {
+    "slug": "bay-play",
+    "title": "BAY PLAY",
+    "feat": null,
+    "released": "2025-11-14",
+    "credits": [
+      "Produced by DJ Idea",
+      "Engineered at Jungle Life Studio"
+    ],
+    "video": {
+      "id": "tSmkDrN3A8s",
+      "label": "BAY PLAY (Astro Clothing video shoot)"
+    },
+    "extraVideos": [
+      {
+        "id": "i7WTIVzmqss",
+        "label": "BAY PLAY — Jungle Life Studio session with ChrisCash"
+      },
+      {
+        "id": "nEKHOoovPcQ",
+        "label": "Bay Play — Crenshaw Visuals upload"
+      }
+    ],
+    "youtubeMusicId": "aAporcw0NFE",
+    "appleMusic": "https://music.apple.com/us/album/bay-play/1877597784?i=1877597785",
+    "spotify": null,
+    "tidal": null,
+    "hook": null,
+    "tile": {
+      "img": "tile-bay-play",
+      "alt": "A man in an orange San Francisco jersey pulls a black hood down over his face in a narrow alley covered in graffiti."
+    },
+    "poster": {
+      "img": "poster-bay-play",
+      "w": 640,
+      "alt": "A man in a white hoodie and black bucket hat poses under pink neon tube lights during the BAY PLAY video shoot."
+    }
+  },
+  {
+    "slug": "top-down",
+    "title": "TOP DOWN",
+    "feat": null,
+    "released": "2025-08-28",
+    "credits": [
+      "Produced by DJ Idea"
+    ],
+    "video": {
+      "id": "DpbIpMfDxnQ",
+      "label": "TOP DOWN (Astro Clothing video shoot)"
+    },
+    "extraVideos": [],
+    "youtubeMusicId": "-h9Jb3zs91c",
+    "appleMusic": "https://music.apple.com/us/album/top-down/1877380693?i=1877380694",
+    "spotify": null,
+    "tidal": null,
+    "hook": null,
+    "tile": {
+      "img": "tile-top-down",
+      "alt": "A man in a red cap crouches beside a black classic convertible on gold wire wheels, palm trees and a blue sky behind him."
+    },
+    "poster": {
+      "img": "poster-top-down",
+      "w": 640,
+      "alt": "A man in a black bucket hat and sunglasses gestures in front of angled neon light strips during the TOP DOWN video shoot."
+    }
+  },
+  {
+    "slug": "funky-flow",
+    "title": "FUNKY FLOW",
+    "feat": null,
+    "released": "2026-07-03",
+    "credits": [
+      "Chris Cash credited on the release"
+    ],
+    "video": {
+      "id": "y18TQdFT898",
+      "label": "FUNKY FLOW (official audio)"
+    },
+    "extraVideos": [],
+    "youtubeMusicId": "y18TQdFT898",
+    "appleMusic": "https://music.apple.com/us/album/funky-flow/6786516379?i=6786516380",
+    "spotify": null,
+    "tidal": null,
+    "hook": null,
+    "tile": {
+      "img": "tile-funky-flow",
+      "alt": "A man in a green track jacket kneels over hand-drawn lettering sketches on the floor, with stacked speakers, a MISSION sign and a small TV marked IV behind him."
+    },
+    "poster": {
+      "img": "poster-funky-flow",
+      "w": 960,
+      "alt": "FUNKY FLOW cover: a man kneels over lettering sketches beside a MISSION sign and old speakers."
+    }
+  },
+  {
+    "slug": "playah-way",
+    "title": "PLAYAH WAY",
+    "feat": "ChrisCash",
+    "released": "2026-02-12",
+    "credits": [],
+    "video": {
+      "id": "ryC7cK5mD_8",
+      "label": "PLAYAH WAY feat. Chris Cash (video)"
+    },
+    "extraVideos": [],
+    "youtubeMusicId": "RKpvu2qC5iY",
+    "appleMusic": "https://music.apple.com/us/album/playah-way-feat-chriscash/1877381156?i=1877381157",
+    "spotify": null,
+    "tidal": null,
+    "hook": null,
+    "tile": {
+      "img": "tile-playah-way",
+      "alt": "A man in an SF cap and black track jacket points down the block, laughing, in front of a mural wall with a painted gorilla."
+    },
+    "poster": {
+      "img": "poster-playah-way",
+      "w": 960,
+      "alt": "A man in an SF cap points down a street lined with murals while a friend stands behind him in the PLAYAH WAY video."
+    }
+  },
+  {
+    "slug": "dominamor",
+    "title": "DOMINAMOR",
+    "feat": "LT",
+    "released": "2026-08-28",
+    "credits": [],
+    "video": {
+      "id": "e653fXuzv8Y",
+      "label": "DOMINAMOR feat. LT (official audio)"
+    },
+    "extraVideos": [],
+    "youtubeMusicId": "e653fXuzv8Y",
+    "appleMusic": "https://music.apple.com/us/album/dominamor-feat-lt/6806288372?i=6806288373",
+    "spotify": null,
+    "tidal": null,
+    "hook": null,
+    "tile": {
+      "img": "tile-dominamor",
+      "alt": "Seen from behind, a man in a black I-80 BarberRome shirt and red pants carries a child dressed in red on his shoulders down a brick path."
+    },
+    "poster": {
+      "img": "poster-dominamor",
+      "w": 960,
+      "alt": "DOMINAMOR cover: a man in a BarberRome I-80 shirt carries a child dressed in red on his shoulders."
+    }
+  }
+]
