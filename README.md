@@ -27,9 +27,9 @@ Live: **https://mdeveloper310.github.io/barberrome-site/** (project site, base p
 - Local preview of the Pages build: `npm run build:pages && OUT_DIR=dist BASE_PATH=/barberrome-site PORT=8081 node scripts/preview.mjs` → http://localhost:8081/barberrome-site/ ; tests: `npm run test:pages`, and `BASE=http://localhost:8081/barberrome-site FORMS_MODE=disabled node scripts/e2e.mjs`.
 - Custom domain later: set it in repo Settings → Pages, then the workflow's `base_url` becomes the domain and the base path drops to empty automatically.
 
-## Email forwarding (FormSubmit) — prepared, NOT active
+## Email forwarding (FormSubmit) — enabled on Pages, waiting for activation
 
-Goal: signup + booking submissions emailed to **iv.forthepeople@gmail.com** from the GitHub Pages site, no server and no account. FormSubmit (https://formsubmit.co, docs https://formsubmit.co/documentation) does this with a plain HTML form `action`. The code is ready; it is off until the inbox owner activates it.
+Goal: signup + booking submissions emailed to **iv.forthepeople@gmail.com** from the GitHub Pages site, no server and no account. FormSubmit (https://formsubmit.co, docs https://formsubmit.co/documentation) does this with a plain HTML form `action`. The live Pages build uses it (`FORMS_MODE: formsubmit` in the workflow, endpoint `https://formsubmit.co/iv.forthepeople@gmail.com` in `site.json`). Nothing is forwarded until the inbox owner clicks FormSubmit's activation email; until then `forms.formsubmitActive` is `false` and each form says email delivery is still being switched on. After activation, set it to `true` and push.
 
 What the `formsubmit` mode does (`FORMS_MODE=formsubmit` + `forms.formsubmitEndpoint`):
 - Forms POST natively to the endpoint (no AJAX, so FormSubmit's reCAPTCHA spam check stays on), with `_subject`, `_template=table`, a `_honey` honeypot, and `_next` = this site's `/join/thanks/` or `/booking/thanks/` (full URL, as FormSubmit requires). JS only validates (email-or-phone, consent) before letting the browser submit.
@@ -37,7 +37,7 @@ What the `formsubmit` mode does (`FORMS_MODE=formsubmit` + `forms.formsubmitEndp
 - Thank-you pages are built again; the join one still says the unreleased drop isn't posted yet unless `reward.url` is set.
 
 Activation (needs the owner, one time):
-1. Set `forms.formsubmitEndpoint` to `https://formsubmit.co/iv.forthepeople@gmail.com` in `src/data/site.json`, and change `FORMS_MODE: disabled` to `FORMS_MODE: formsubmit` in `.github/workflows/pages.yml`. Push.
+1. Done: endpoint set and the workflow builds with `FORMS_MODE: formsubmit`.
 2. Submit either form once on the live site. FormSubmit then emails **iv.forthepeople@gmail.com** an activation link; click it (check spam). Until that click nothing is forwarded (FormSubmit holds submissions up to 30 days and delivers them after confirming).
 3. Optional: the activation email includes a random-string alias. Swap it into `formsubmitEndpoint` so the raw address isn't in the HTML (it's already public via the mailto buttons, so this is just spam hygiene).
 4. Send one real test from the live site and check it arrives.

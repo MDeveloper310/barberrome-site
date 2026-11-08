@@ -39,8 +39,9 @@
     "_modes": "netlify = Netlify Forms (default). function = POST JSON to the Netlify functions relay. formsubmit = native POST to FormSubmit (formsubmit.co), which emails each submission; needs formsubmitEndpoint + one-time activation by the inbox owner. disabled = no forms (GitHub Pages default).",
     "joinFunction": "/.netlify/functions/subscribe",
     "bookingFunction": "/.netlify/functions/booking",
-    "formsubmitEndpoint": null,
-    "_formsubmitNote": "PENDING ACTIVATION — not live. Set to https://formsubmit.co/iv.forthepeople@gmail.com (or, after activation, the random-string alias FormSubmit emails you) and build with FORMS_MODE=formsubmit. See README 'Email forwarding (FormSubmit)'."
+    "formsubmitEndpoint": "https://formsubmit.co/iv.forthepeople@gmail.com",
+    "_formsubmitNote": "Endpoint set. formsubmitActive stays false until the inbox owner clicks FormSubmit's activation email; while false the forms say delivery is still being set up. Flip to true after confirmation and push.",
+    "formsubmitActive": false
   },
   "contact": {
     "email": "iv.forthepeople@gmail.com",

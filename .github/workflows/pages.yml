@@ -1,6 +1,6 @@
 # Build the static site and publish it to GitHub Pages.
-# Netlify deploys are unaffected (netlify.toml). Pages has no form backend, so
-# FORMS_MODE=disabled swaps forms for an Instagram fallback instead of faking submissions.
+# Netlify deploys are unaffected (netlify.toml). Pages has no form backend of its own:
+# Forms post to FormSubmit (emails iv.forthepeople@gmail.com once activated). Change FORMS_MODE below to "disabled" to turn them off.
 name: Deploy to GitHub Pages
 
 on:
@@ -28,7 +28,7 @@ jobs:
       - name: Build and test
         env:
           SITE_URL: ${{ steps.pages.outputs.base_url }}
-          FORMS_MODE: disabled
+          FORMS_MODE: formsubmit
         run: npm test
       - uses: actions/upload-pages-artifact@v3
         with:

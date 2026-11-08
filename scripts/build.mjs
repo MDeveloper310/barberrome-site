@@ -36,7 +36,7 @@ function formWiring(name, subject) {
   <input type="hidden" name="_template" value="table">
   <input type="hidden" name="form" value="${name}">
   <p class="hp"><label>Leave this empty <input name="_honey" tabindex="-1" autocomplete="off"></label></p>`,
-    note: `<p class="small muted" style="margin:0">Sent by email through FormSubmit (formsubmit.co). <a href="${B}/privacy/">Privacy</a></p>`
+    note: `<p class="small muted" style="margin:0">Sent by email through FormSubmit (formsubmit.co), which may show a quick spam check. <a href="${B}/privacy/">Privacy</a>${site.forms.formsubmitActive ? "" : `<br><strong>Email delivery is still being switched on.</strong> If you don’t hear back, DM <a href="${esc(L.instagram)}" target="_blank" rel="noopener">${esc(L.instagramHandle)}</a>.`}</p>`
   };
   return {
     attrs: `method="POST" action="${B}/${name === "join" ? "join" : "booking"}/thanks/" data-netlify="true" netlify-honeypot="bot-field"`,
@@ -417,9 +417,9 @@ function home() {
 <section class="join sec" id="join" aria-labelledby="join-h">
   <div class="wrap join__in">
     <div>
-      <p class="eyebrow">${FORMS_ON ? "Unreleased" : "The list"}</p>
+      <p class="eyebrow">${FORMS_ON && site.reward.url ? "Unreleased" : "The list"}</p>
       <h2 id="join-h">Join the list</h2>
-      <p class="join__lede">${FORMS_ON ? `Drop your email or number and I’ll send you ${esc(site.reward.label)}. New tracks and shows hit this list first.` : "The list isn’t open yet. New tracks and shows go on Instagram first for now."}</p>
+      <p class="join__lede">${FORMS_ON ? (site.reward.url ? `Drop your email or number and I’ll send you ${esc(site.reward.label)}. New tracks and shows hit this list first.` : "Drop your email or number. New tracks, shows and the unreleased drop (once it’s ready) hit this list first.") : "The list isn’t open yet. New tracks and shows go on Instagram first for now."}</p>
       ${!FORMS_ON ? "" : draft(site.reward.url ? "reward.url set: " + site.reward.url : "reward.url not set — success message says the drop isn't posted yet.")}
     </div>
     ${joinForm("after_grid", { compact: true })}
@@ -491,7 +491,7 @@ function trackPage(t, idx) {
   ${t.extraVideos.length ? `<section aria-labelledby="more-v" style="margin-top:2rem"><h2 id="more-v" style="font-size:2rem">More from ${esc(t.title)}</h2><div class="extras">${t.extraVideos.map((v) => `<a class="btn btn--ghost" href="${ytWatch(v.id)}" target="_blank" rel="noopener" data-track="stream_click" data-platform="youtube" data-track-slug="${t.slug}" data-placement="track_extra">${esc(v.label)} ${ICON.ext}</a>`).join("")}</div></section>` : ""}
   <section class="sec" aria-labelledby="tj-h" style="padding-bottom:0">
     <div class="join__in" style="display:grid;gap:1rem">
-      <div><p class="eyebrow">${FORMS_ON ? "Unreleased" : "The list"}</p><h2 id="tj-h">Join the list</h2><p class="muted" style="margin-top:.6rem">${FORMS_ON ? `Email or number. I’ll send you ${esc(site.reward.label)}.` : "Not open yet. Follow along on Instagram."}</p></div>
+      <div><p class="eyebrow">${FORMS_ON && site.reward.url ? "Unreleased" : "The list"}</p><h2 id="tj-h">Join the list</h2><p class="muted" style="margin-top:.6rem">${FORMS_ON ? (site.reward.url ? `Email or number. I’ll send you ${esc(site.reward.label)}.` : "Email or number. New tracks and shows hit this list first.") : "Not open yet. Follow along on Instagram."}</p></div>
       ${joinForm(`track_${t.slug}`, { compact: true })}
     </div>
   </section>
