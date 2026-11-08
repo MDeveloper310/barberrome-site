@@ -6,6 +6,7 @@ import fs from "node:fs";
 const CHROME = process.env.CHROME || "google-chrome";
 const BASE = process.env.BASE || "http://localhost:8080";
 const SHOTS = process.env.SHOTS || "";
+const FORMS_ON = (process.env.FORMS_MODE || "netlify") !== "disabled";
 const port = 9300 + Math.floor(Math.random() * 500);
 const chrome = spawn(CHROME, ["--headless=new", "--no-sandbox", "--disable-gpu", "--hide-scrollbars", `--remote-debugging-port=${port}`, "--user-data-dir=/tmp/br-e2e-" + port, "about:blank"], { stdio: "ignore" });
 const sleep = (ms) => new Promise((r) => setTimeout(r, ms));
@@ -67,9 +68,14 @@ await ev("document.dispatchEvent(new KeyboardEvent('keydown',{key:'Escape'}))");
 ok(await ev("!document.getElementById('stream-sheet').classList.contains('is-open')"), "Escape closes chooser");
 // tracking
 ok(await ev("dataLayer.some(e=>e.event==='play_click') && dataLayer.some(e=>e.event==='tile_expand') && dataLayer.some(e=>e.event==='stream_open')"), "events pushed to dataLayer");
-// hero quick join + honest local submit
+// hero quick join
 await ev("document.querySelector('[data-join-open]').click()"); await sleep(100);
-ok(await ev("!document.getElementById('hero-join').hidden"), "hero Join the list opens inline form");
+ok(await ev("!document.getElementById('hero-join').hidden"), "hero Join the list opens inline box");
+if (!FORMS_ON) {
+  ok(await ev("document.querySelectorAll('form').length===0"), "forms disabled: no form elements on the page");
+  ok(await ev("/aren’t open/.test(document.getElementById('hero-join').textContent) && !!document.querySelector('#hero-join a[href*=\"instagram.com/barberrome\"]')"), "forms disabled: honest notice + Instagram link in hero");
+  ok(await ev("!/I’ll send you/.test(document.body.textContent)"), "forms disabled: no reward promise");
+} else {
 const status = await ev(`(async()=>{const f=document.querySelector('#hero-join form');f.querySelector('[name=email]').value='test@example.com';f.querySelector('[name=email]').dispatchEvent(new Event('input'));f.querySelector('[name=consent]').checked=true;f.requestSubmit();await new Promise(r=>setTimeout(r,800));return f.querySelector('[data-status]').textContent})()`);
 ok(/Not sent/.test(status || ""), `local submit reports honestly: "${status}"`);
 if (!/Not sent/.test(status || "")) console.log(await ev(`JSON.stringify([...document.querySelectorAll('#hero-join form [name]')].map(i=>[i.name,i.validationMessage,i.value]))`));
@@ -78,6 +84,7 @@ const v = await ev(`(()=>{const f=document.querySelector('#join form');f.querySe
 ok(v === false, "join form requires email or phone");
 const v2 = await ev(`(()=>{const f=document.querySelector('#join form');f.querySelector('[name=phone]').value='707 555 0123';f.querySelector('[name=phone]').dispatchEvent(new Event('input'));f.querySelector('[name=consent]').checked=true;return f.checkValidity()})()`);
 ok(v2 === true, "phone-only signup is valid with consent");
+}
 ok(await ev("document.documentElement.scrollWidth<=window.innerWidth+1"), "no horizontal overflow at 390px");
 
 // track page facade
@@ -92,9 +99,10 @@ ok(await ev("1") === undefined || true, "page renders with JS disabled");
 await send("Emulation.setScriptExecutionDisabled", { value: false });
 // (evaluate is allowed even when page scripts are disabled)
 ok(await ev("document.querySelector('[data-expand]').hidden===true"), "no-JS: expand buttons stay hidden");
-ok(await ev("document.querySelector('.tile__title a').getAttribute('href').startsWith('/tracks/')"), "no-JS: tiles link to track pages");
-ok(await ev("document.querySelector('.ctas [data-stream-open]').getAttribute('href')==='#listen'"), "no-JS: Stream falls back to #listen links");
-ok(await ev("document.querySelector('#join form').getAttribute('action')==='/join/thanks/' && document.querySelector('#join form [name=email]').required"), "no-JS: join form posts natively with email required");
+ok(await ev("new URL(document.querySelector('.tile__title a').href).pathname.includes('/tracks/')"), "no-JS: tiles link to track pages");
+ok(await ev("document.querySelector('.ctas [data-stream-open]').getAttribute('href').endsWith('#listen')"), "no-JS: Stream falls back to #listen links");
+if (FORMS_ON) ok(await ev("document.querySelector('#join form').getAttribute('action').endsWith('/join/thanks/') && document.querySelector('#join form [name=email]').required"), "no-JS: join form posts natively with email required");
+else ok(await ev("document.querySelectorAll('form').length===0 && !!document.querySelector('[data-forms-off=join] a[href*=\"instagram\"]')"), "no-JS: no forms, Instagram fallback visible");
 
 // desktop
 await go(BASE + "/", { width: 1440, height: 900 });

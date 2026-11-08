@@ -242,7 +242,7 @@
           method: "POST", headers: { "Content-Type": "application/json", Accept: "application/json" }, body: JSON.stringify(obj)
         });
       } else {
-        req = fetch("/", { method: "POST", headers: { "Content-Type": "application/x-www-form-urlencoded" }, body: encode(fd) });
+        req = fetch((CFG.basePath || "") + "/", { method: "POST", headers: { "Content-Type": "application/x-www-form-urlencoded" }, body: encode(fd) });
       }
       req.then(function (res) {
         if (res.ok) return res;

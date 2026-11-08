@@ -5,8 +5,11 @@ Run `npm run build:draft` and open `dist-draft/` to see the remaining gaps (rewa
 Lyrics and hook lines are out for now at the owner's request; they are not a launch blocker.
 
 ## Must do before going live
+
+The site is live on GitHub Pages (https://mdeveloper310.github.io/barberrome-site/) with signups and booking switched off there. Items below are what's left for a full launch.
+
 - [ ] **Domain.** Set `SITE_URL` (Netlify env) or `siteUrl` in `src/data/site.json`. Until then canonical/OG/sitemap use the fallback host. Rebuild after.
-- [ ] **Forms backend.** Deploy on Netlify (forms are auto-detected) and turn on form notifications, **or** switch `forms.mode` to `function` and set `SUBSCRIBE_WEBHOOK_URL` / `BOOKING_WEBHOOK_URL`. Send a real test submission from the live site.
+- [ ] **Forms backend.** On GitHub Pages forms are disabled (Instagram fallback). To collect signups/bookings: Deploy on Netlify (forms are auto-detected) and turn on form notifications, **or** switch `forms.mode` to `function` and set `SUBSCRIBE_WEBHOOK_URL` / `BOOKING_WEBHOOK_URL`. Send a real test submission from the live site.
 - [ ] **Email/SMS list.** Decide where contacts end up (Laylo, Mailchimp, Community, a sheet). If you text people, use an SMS provider that handles STOP/HELP and consent records. The checkbox wording is on the forms and in `/privacy/`.
 - [ ] **Unreleased reward.** `reward.url` is null. Upload the unreleased cut / shop voice note somewhere private (unlisted SoundCloud, Dropbox link, a hidden page) and set `reward.url`. Until then the thank-you message says it isn't posted yet. Note: a URL shown on the thank-you page can be shared; for a gated file, email it from your list tool instead.
 - [ ] **Artist sign-off on the first-person copy**: hero line, "Barber / Rapper" strip, Chair to Mic cards, join/booking lines (all in `scripts/build.mjs`, `CARDS` and `home()`).

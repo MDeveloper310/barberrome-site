@@ -41,7 +41,7 @@
     "bookingFunction": "/.netlify/functions/booking"
   },
   "contact": {
-    "email": null,
+    "email": "iv.forthepeople@gmail.com",
     "shopName": null,
     "shopCity": "Vallejo, CA"
   },

@@ -2,14 +2,18 @@
   "name": "barberrome-site",
   "version": "1.0.0",
   "private": true,
-  "description": "BarberRome artist site — static HTML/CSS/JS, Netlify-ready.",
+  "description": "BarberRome artist site \u2014 static HTML/CSS/JS, Netlify-ready.",
   "type": "module",
-  "engines": { "node": ">=18" },
+  "engines": {
+    "node": ">=18"
+  },
   "scripts": {
     "build": "node scripts/build.mjs",
     "build:draft": "DRAFT=1 OUT_DIR=dist-draft node scripts/build.mjs",
     "preview": "node scripts/build.mjs && node scripts/preview.mjs",
     "test": "node scripts/build.mjs && node scripts/test.mjs",
-    "images": "python3 scripts/images.py"
+    "images": "python3 scripts/images.py",
+    "build:pages": "SITE_URL=https://mdeveloper310.github.io/barberrome-site FORMS_MODE=disabled node scripts/build.mjs",
+    "test:pages": "SITE_URL=https://mdeveloper310.github.io/barberrome-site FORMS_MODE=disabled npm test"
   }
 }

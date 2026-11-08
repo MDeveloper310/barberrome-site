@@ -18,7 +18,11 @@ const DRAFT = !!process.env.DRAFT;
 // ---- site URL: never invent a domain --------------------------------------
 let SITE_URL = (process.env.SITE_URL || site.siteUrl || process.env.URL || "http://localhost:8080").replace(/\/+$/, "");
 if (/localhost/.test(SITE_URL)) console.warn("⚠  SITE_URL not set — canonical/OG/sitemap URLs use " + SITE_URL + ". Set SITE_URL or site.json siteUrl before launch.");
-const abs = (p) => SITE_URL + p;
+const abs = (p) => SITE_URL + p;                       // absolute URL (canonical, OG, sitemap)
+const B = new URL(SITE_URL).pathname.replace(/\/+$/, ""); // base path, e.g. "/barberrome-site" on GitHub Pages, "" at a domain root
+// Forms: "netlify" (default) | "function" | "disabled" (static hosts with no backend, e.g. GitHub Pages)
+const FORMS = process.env.FORMS_MODE || site.forms.mode;
+const FORMS_ON = FORMS !== "disabled";
 
 // ---- helpers ----------------------------------------------------------------
 const esc = (s = "") => String(s).replace(/[&<>"']/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]));
@@ -49,9 +53,9 @@ const ICON = {
 
 // <picture> with webp + jpg fallback
 function pic(base, widths, alt, { sizes = "100vw", lazy = true, cls = "", w, h, priority = false } = {}) {
-  const set = (ext) => widths.map((x) => `/assets/img/${base}-${x}.${ext} ${x}w`).join(", ");
+  const set = (ext) => widths.map((x) => `${B}/assets/img/${base}-${x}.${ext} ${x}w`).join(", ");
   const largest = widths[widths.length - 1];
-  return `<picture><source type="image/webp" srcset="${set("webp")}" sizes="${sizes}"><img src="/assets/img/${base}-${largest}.jpg" srcset="${set("jpg")}" sizes="${sizes}" alt="${esc(alt)}"${cls ? ` class="${cls}"` : ""}${w ? ` width="${w}" height="${h}"` : ""}${lazy ? ' loading="lazy" decoding="async"' : ""}${priority ? ' fetchpriority="high"' : ""}></picture>`;
+  return `<picture><source type="image/webp" srcset="${set("webp")}" sizes="${sizes}"><img src="${B}/assets/img/${base}-${largest}.jpg" srcset="${set("jpg")}" sizes="${sizes}" alt="${esc(alt)}"${cls ? ` class="${cls}"` : ""}${w ? ` width="${w}" height="${h}"` : ""}${lazy ? ' loading="lazy" decoding="async"' : ""}${priority ? ' fetchpriority="high"' : ""}></picture>`;
 }
 const tileWidths = [360, 720];
 const posterWidths = (t) => (t.poster.w === 960 ? [640, 960] : [640]);
@@ -80,8 +84,23 @@ function streamLinks(t, placement, cls = "", { sub = "fallback" } = {}) {
 }
 
 // ---- forms -----------------------------------------------------------------
+// Shown instead of a form when FORMS_MODE=disabled. No form element, so nothing can
+// "submit" and nothing pretends to be captured.
+function formsOff(kind) {
+  const ig = `<a class="btn btn--ghost" href="${esc(L.instagram)}" target="_blank" rel="noopener" data-track="social_click" data-platform="instagram" data-placement="${kind}_fallback">DM ${esc(L.instagramHandle)} on Instagram ${ICON.ext}</a>`;
+  const subject = kind === "join" ? "Add me to the BarberRome list" : "Booking inquiry: BarberRome";
+  const mail = site.contact.email
+    ? `<a class="btn btn--ghost" href="mailto:${esc(site.contact.email)}?subject=${encodeURIComponent(subject)}" data-track="email_click" data-placement="${kind}_fallback">Email ${esc(site.contact.email)}</a>`
+    : "";
+  const msg = kind === "join"
+    ? `Signups aren’t open on this site yet. ${site.contact.email ? "Email me to get on the list, or follow" : "Follow"} me on Instagram for new drops.`
+    : `Booking requests aren’t taken through this site yet. ${site.contact.email ? "Email me or send" : "Send"} a DM on Instagram with what you need.`;
+  return `<div class="form form--card forms-off" data-forms-off="${kind}"><p style="margin:0">${msg}</p>${mail}${ig}</div>`;
+}
+
 function joinForm(placement, { compact = false, idp = placement } = {}) {
-  return `<form class="form${compact ? " form--card" : ""}" name="join" method="POST" action="/join/thanks/" data-netlify="true" netlify-honeypot="bot-field" data-form="join" aria-label="Join the BarberRome list">
+  if (!FORMS_ON) return formsOff("join");
+  return `<form class="form${compact ? " form--card" : ""}" name="join" method="POST" action="${B}/join/thanks/" data-netlify="true" netlify-honeypot="bot-field" data-form="join" aria-label="Join the BarberRome list">
   <input type="hidden" name="form-name" value="join">
   <input type="hidden" name="placement" value="${esc(placement)}">
   <p class="hp"><label>Leave this empty <input name="bot-field" tabindex="-1" autocomplete="off"></label></p>
@@ -89,14 +108,15 @@ function joinForm(placement, { compact = false, idp = placement } = {}) {
     <div class="field"><label for="${idp}-email">Email</label><input id="${idp}-email" type="email" name="email" autocomplete="email" inputmode="email" placeholder="you@email.com" required></div>
     <div class="field"><label for="${idp}-phone">Phone <span class="muted">(for texts)</span></label><input id="${idp}-phone" type="tel" name="phone" autocomplete="tel" inputmode="tel" placeholder="(707) 555-0123"></div>
   </div>
-  <label class="check"><input type="checkbox" name="consent" value="yes" required> <span>Yes — send me BarberRome updates by email, and by text if I added a number. Msg &amp; data rates may apply. Reply STOP to stop texts, unsubscribe any time. <a href="/privacy/">Privacy</a></span></label>
+  <label class="check"><input type="checkbox" name="consent" value="yes" required> <span>Yes — send me BarberRome updates by email, and by text if I added a number. Msg &amp; data rates may apply. Reply STOP to stop texts, unsubscribe any time. <a href="${B}/privacy/">Privacy</a></span></label>
   <button class="btn btn--solid-gold" type="submit">Join the list</button>
   <p class="status small" data-status role="status" aria-live="polite"></p>
 </form>`;
 }
 
 function bookingForm() {
-  return `<form class="form form--card" name="booking" method="POST" action="/booking/thanks/" data-netlify="true" netlify-honeypot="bot-field" data-form="booking" aria-label="Booking inquiry">
+  if (!FORMS_ON) return formsOff("booking");
+  return `<form class="form form--card" name="booking" method="POST" action="${B}/booking/thanks/" data-netlify="true" netlify-honeypot="bot-field" data-form="booking" aria-label="Booking inquiry">
   <input type="hidden" name="form-name" value="booking">
   <p class="hp"><label>Leave this empty <input name="bot-field" tabindex="-1" autocomplete="off"></label></p>
   <div class="row2">
@@ -119,7 +139,7 @@ function layout({ pathName, title, description, body, ogImage, ogType = "website
   const canonical = abs(pathName);
   const img = ogImage || { url: "/assets/img/og-barberrome.jpg", w: 1200, h: 630, alt: "BarberRome sitting on the hood of a red convertible in front of a mural wall, cloudy sky overhead." };
   const cfg = {
-    formsMode: site.forms.mode, joinFunction: site.forms.joinFunction, bookingFunction: site.forms.bookingFunction,
+    formsMode: FORMS, basePath: B, joinFunction: site.forms.joinFunction, bookingFunction: site.forms.bookingFunction,
     rewardUrl: site.reward.url, rewardLabel: site.reward.label, instagramHandle: L.instagramHandle
   };
   const nav = [["Music", "/#music"], ["Chair to Mic", "/#chair-to-mic"], ["Join", "/#join"], ["Book", "/#book"]];
@@ -147,9 +167,9 @@ ${noindex ? '<meta name="robots" content="noindex, follow">\n' : ""}<meta name="
 <meta name="twitter:description" content="${esc(description)}">
 <meta name="twitter:image" content="${abs(img.url)}">
 <meta name="twitter:image:alt" content="${esc(img.alt)}">
-<link rel="icon" href="/assets/favicon.svg" type="image/svg+xml">
-<link rel="preload" href="/assets/fonts/barlow-condensed-800.woff2" as="font" type="font/woff2" crossorigin>
-${preload}<link rel="stylesheet" href="/assets/css/site.css?v=${CSS_V}">
+<link rel="icon" href="${B}/assets/favicon.svg" type="image/svg+xml">
+<link rel="preload" href="${B}/assets/fonts/barlow-condensed-800.woff2" as="font" type="font/woff2" crossorigin>
+${preload}<link rel="stylesheet" href="${B}/assets/css/site.css?v=${CSS_V}">
 <script>document.documentElement.className+=" js";window.BR_CONFIG=${JSON.stringify(cfg)};</script>
 ${jsonld.map((j) => `<script type="application/ld+json">${JSON.stringify(j)}</script>`).join("\n")}
 ${analytics}
@@ -158,11 +178,11 @@ ${analytics}
 <a class="skip" href="#main">Skip to content</a>
 <header class="top">
   <div class="wrap top__in">
-    <a class="mark" href="/" aria-label="BarberRome home">Barber<b>Rome</b></a>
+    <a class="mark" href="${B}/" aria-label="BarberRome home">Barber<b>Rome</b></a>
     <nav class="nav" aria-label="Main">
-      ${nav.map(([l, h], i) => `<a href="${h}"${i > 1 ? ' class="hide-sm"' : ""}${active === l ? ' aria-current="page"' : ""}>${l}</a>`).join("\n      ")}
+      ${nav.map(([l, h], i) => `<a href="${B}${h}"${i > 1 ? ' class="hide-sm"' : ""}${active === l ? ' aria-current="page"' : ""}>${l}</a>`).join("\n      ")}
     </nav>
-    <a class="btn btn--sm" href="/#listen" data-stream-open data-placement="header">Stream</a>
+    <a class="btn btn--sm" href="${B}/#listen" data-stream-open data-placement="header">Stream</a>
   </div>
 </header>
 <main id="main">
@@ -170,7 +190,7 @@ ${body}
 </main>
 ${footer()}
 ${streamSheet()}
-<script src="/assets/js/site.js?v=${JS_V}" defer></script>
+<script src="${B}/assets/js/site.js?v=${JS_V}" defer></script>
 </body>
 </html>
 `;
@@ -212,14 +232,14 @@ function footer() {
     <div id="book">
       <p class="eyebrow">Booking</p>
       <h2>Shows, features, cuts.</h2>
-      <p class="muted" style="margin:.7rem 0 1rem">Tell me what you need. ${site.contact.email ? `Or email <a href="mailto:${esc(site.contact.email)}">${esc(site.contact.email)}</a>.` : `Or DM <a href="${esc(L.instagram)}" target="_blank" rel="noopener">${esc(L.instagramHandle)}</a>.`}</p>
+      <p class="muted" style="margin:.7rem 0 1rem">${!FORMS_ON ? "Shows, features, haircuts." : `Tell me what you need. ${site.contact.email ? `Or email <a href="mailto:${esc(site.contact.email)}">${esc(site.contact.email)}</a>.` : `Or DM <a href="${esc(L.instagram)}" target="_blank" rel="noopener">${esc(L.instagramHandle)}</a>.`}`}</p>
       ${draft("contact.email / shop name not set in site.json — booking form + Instagram only.")}
       ${bookingForm()}
     </div>
   </div>
   <div class="wrap legal">
     <span>© ${new Date().getFullYear()} BarberRome</span>
-    <a href="/privacy/">Privacy</a>
+    <a href="${B}/privacy/">Privacy</a>
     <span>Images: stills from BarberROME's own videos and release covers.</span>
   </div>
 </footer>`;
@@ -261,7 +281,7 @@ function heroPlayer() {
       <p class="player__title">${esc(lead.title)}</p>
       <p class="player__sub">${esc(metaLine(lead))}${lead.credits[0] ? " · " + esc(lead.credits[0]) : ""}</p>
     </div>
-    <a class="playbtn" href="/tracks/${lead.slug}/" data-play data-video="${lead.video.id}" data-title="${esc(lead.title)}" data-track-slug="${lead.slug}" data-placement="hero" aria-label="Play ${esc(lead.title)}">${ICON.play}</a>
+    <a class="playbtn" href="${B}/tracks/${lead.slug}/" data-play data-video="${lead.video.id}" data-title="${esc(lead.title)}" data-track-slug="${lead.slug}" data-placement="hero" aria-label="Play ${esc(lead.title)}">${ICON.play}</a>
   </div>
   <div class="player__screen" data-screen></div>
   <div class="player__foot">
@@ -281,7 +301,7 @@ function tile(t, i) {
     ${t.slug === lead.slug ? '<span class="tile__badge">Lead track</span>' : ""}
     <div class="tile__body">
       <div class="tile__txt">
-        <h3 class="tile__title" id="t-${t.slug}"><a href="/tracks/${t.slug}/" style="text-decoration:none">${esc(t.title)}</a></h3>
+        <h3 class="tile__title" id="t-${t.slug}"><a href="${B}/tracks/${t.slug}/" style="text-decoration:none">${esc(t.title)}</a></h3>
         <p class="tile__meta">${esc(metaLine(t))}</p>
         <p class="tile__hook">${hook ? `“${esc(hook)}”` : esc(sub)}</p>
       </div>
@@ -294,7 +314,7 @@ function tile(t, i) {
       <div class="tile__actions">
         <span class="wave" aria-hidden="true">${"<i></i>".repeat(10)}</span>
         <span class="links">${streamLinks(t, "grid").join("")}</span>
-        <a class="btn btn--sm btn--ghost tile__deep" href="/tracks/${t.slug}/" data-track="track_page_open" data-track-slug="${t.slug}">Track page ${ICON.arrow}</a>
+        <a class="btn btn--sm btn--ghost tile__deep" href="${B}/tracks/${t.slug}/" data-track="track_page_open" data-track-slug="${t.slug}">Track page ${ICON.arrow}</a>
       </div>
     </div>
   </article>
@@ -310,16 +330,16 @@ const CARDS = [
 ];
 
 function home() {
-  const preload = `<link rel="preload" as="image" type="image/webp" media="(max-width: 699px)" imagesrcset="/assets/img/hero-tall-480.webp 480w, /assets/img/hero-tall-720.webp 720w" imagesizes="100vw">
-<link rel="preload" as="image" type="image/webp" media="(min-width: 700px)" imagesrcset="/assets/img/hero-wide-960.webp 960w, /assets/img/hero-wide-1280.webp 1280w" imagesizes="100vw">
+  const preload = `<link rel="preload" as="image" type="image/webp" media="(max-width: 699px)" imagesrcset="${B}/assets/img/hero-tall-480.webp 480w, ${B}/assets/img/hero-tall-720.webp 720w" imagesizes="100vw">
+<link rel="preload" as="image" type="image/webp" media="(min-width: 700px)" imagesrcset="${B}/assets/img/hero-wide-960.webp 960w, ${B}/assets/img/hero-wide-1280.webp 1280w" imagesizes="100vw">
 `;
   const heroMedia = site.hero.loopVideo
-    ? `<video autoplay muted loop playsinline preload="metadata" poster="/assets/img/hero-wide-1280.jpg" aria-hidden="true"><source src="${esc(site.hero.loopVideo)}" type="video/mp4"></video>`
+    ? `<video autoplay muted loop playsinline preload="metadata" poster="${B}/assets/img/hero-wide-1280.jpg" aria-hidden="true"><source src="${esc(site.hero.loopVideo)}" type="video/mp4"></video>`
     : `<picture>
-      <source media="(max-width: 699px)" type="image/webp" srcset="/assets/img/hero-tall-480.webp 480w, /assets/img/hero-tall-720.webp 720w" sizes="100vw">
-      <source media="(max-width: 699px)" srcset="/assets/img/hero-tall-480.jpg 480w, /assets/img/hero-tall-720.jpg 720w" sizes="100vw">
-      <source type="image/webp" srcset="/assets/img/hero-wide-640.webp 640w, /assets/img/hero-wide-960.webp 960w, /assets/img/hero-wide-1280.webp 1280w" sizes="100vw">
-      <img src="/assets/img/hero-wide-1280.jpg" srcset="/assets/img/hero-wide-640.jpg 640w, /assets/img/hero-wide-960.jpg 960w, /assets/img/hero-wide-1280.jpg 1280w" sizes="100vw" width="1280" height="720" fetchpriority="high" alt="BarberRome sits on the hood of a red convertible in front of a mural-covered wall while a friend stands by, clouds overhead.">
+      <source media="(max-width: 699px)" type="image/webp" srcset="${B}/assets/img/hero-tall-480.webp 480w, ${B}/assets/img/hero-tall-720.webp 720w" sizes="100vw">
+      <source media="(max-width: 699px)" srcset="${B}/assets/img/hero-tall-480.jpg 480w, ${B}/assets/img/hero-tall-720.jpg 720w" sizes="100vw">
+      <source type="image/webp" srcset="${B}/assets/img/hero-wide-640.webp 640w, ${B}/assets/img/hero-wide-960.webp 960w, ${B}/assets/img/hero-wide-1280.webp 1280w" sizes="100vw">
+      <img src="${B}/assets/img/hero-wide-1280.jpg" srcset="${B}/assets/img/hero-wide-640.jpg 640w, ${B}/assets/img/hero-wide-960.jpg 960w, ${B}/assets/img/hero-wide-1280.jpg 1280w" sizes="100vw" width="1280" height="720" fetchpriority="high" alt="BarberRome sits on the hood of a red convertible in front of a mural-covered wall while a friend stands by, clouds overhead.">
     </picture>`;
   const body = `
 <section class="hero" aria-labelledby="h1">
@@ -373,10 +393,10 @@ function home() {
 <section class="join sec" id="join" aria-labelledby="join-h">
   <div class="wrap join__in">
     <div>
-      <p class="eyebrow">Unreleased</p>
+      <p class="eyebrow">${FORMS_ON ? "Unreleased" : "The list"}</p>
       <h2 id="join-h">Join the list</h2>
-      <p class="join__lede">Drop your email or number and I’ll send you ${esc(site.reward.label)}. New tracks and shows hit this list first.</p>
-      ${draft(site.reward.url ? "reward.url set: " + site.reward.url : "reward.url not set — success message says the drop isn't posted yet.")}
+      <p class="join__lede">${FORMS_ON ? `Drop your email or number and I’ll send you ${esc(site.reward.label)}. New tracks and shows hit this list first.` : "The list isn’t open yet. New tracks and shows go on Instagram first for now."}</p>
+      ${!FORMS_ON ? "" : draft(site.reward.url ? "reward.url set: " + site.reward.url : "reward.url not set — success message says the drop isn't posted yet.")}
     </div>
     ${joinForm("after_grid", { compact: true })}
   </div>
@@ -420,7 +440,7 @@ function trackPage(t, idx) {
   // VideoObject wants uploadDate; we only know the YouTube publish date for some — omit rather than guess.
   const body = `
 <div class="wrap">
-  <nav class="crumbs" aria-label="Breadcrumb"><a href="/">BarberRome</a> / <a href="/#music">Tracks</a> / <span aria-current="page">${esc(t.title)}</span></nav>
+  <nav class="crumbs" aria-label="Breadcrumb"><a href="${B}/">BarberRome</a> / <a href="${B}/#music">Tracks</a> / <span aria-current="page">${esc(t.title)}</span></nav>
   <section class="track-hero" aria-labelledby="h1">
     <div class="track-hero__grid">
       <div data-player-root>
@@ -447,15 +467,15 @@ function trackPage(t, idx) {
   ${t.extraVideos.length ? `<section aria-labelledby="more-v" style="margin-top:2rem"><h2 id="more-v" style="font-size:2rem">More from ${esc(t.title)}</h2><div class="extras">${t.extraVideos.map((v) => `<a class="btn btn--ghost" href="${ytWatch(v.id)}" target="_blank" rel="noopener" data-track="stream_click" data-platform="youtube" data-track-slug="${t.slug}" data-placement="track_extra">${esc(v.label)} ${ICON.ext}</a>`).join("")}</div></section>` : ""}
   <section class="sec" aria-labelledby="tj-h" style="padding-bottom:0">
     <div class="join__in" style="display:grid;gap:1rem">
-      <div><p class="eyebrow">Unreleased</p><h2 id="tj-h">Join the list</h2><p class="muted" style="margin-top:.6rem">Email or number. I’ll send you ${esc(site.reward.label)}.</p></div>
+      <div><p class="eyebrow">${FORMS_ON ? "Unreleased" : "The list"}</p><h2 id="tj-h">Join the list</h2><p class="muted" style="margin-top:.6rem">${FORMS_ON ? `Email or number. I’ll send you ${esc(site.reward.label)}.` : "Not open yet. Follow along on Instagram."}</p></div>
       ${joinForm(`track_${t.slug}`, { compact: true })}
     </div>
   </section>
   <nav class="pn" aria-label="More tracks">
-    <a href="/tracks/${prev.slug}/"><small>← Previous</small><b>${esc(prev.title)}</b></a>
-    <a class="next" href="/tracks/${next.slug}/"><small>Next →</small><b>${esc(next.title)}</b></a>
+    <a href="${B}/tracks/${prev.slug}/"><small>← Previous</small><b>${esc(prev.title)}</b></a>
+    <a class="next" href="${B}/tracks/${next.slug}/"><small>Next →</small><b>${esc(next.title)}</b></a>
   </nav>
-  <p style="margin:1.5rem 0 3rem"><a href="/#music">All tracks</a></p>
+  <p style="margin:1.5rem 0 3rem"><a href="${B}/#music">All tracks</a></p>
 </div>`;
   return layout({
     pathName: `/tracks/${t.slug}/`, title, description, body, ogType: "music.song", jsonld: [ld], active: "Music",
@@ -470,16 +490,17 @@ function simple(pathName, title, h1, html, { noindex = false } = {}) {
 const joinThanks = simple("/join/thanks/", "You're on the list", "You’re on the list", `
 <p>Thanks for joining.</p>
 ${site.reward.url ? `<p class="reward">Here’s ${esc(site.reward.label)}: <a href="${esc(site.reward.url)}" data-track="reward_open">open it</a>.</p>` : `<p class="reward">The unreleased drop isn’t posted yet. It goes to this list first.</p>`}
-<p><a class="btn" href="/#music">Back to the music</a></p>`, { noindex: true });
-const bookingThanks = simple("/booking/thanks/", "Inquiry sent", "Inquiry sent", `<p>Got it. I’ll get back to you.</p><p><a class="btn" href="/">Back home</a></p>`, { noindex: true });
+<p><a class="btn" href="${B}/#music">Back to the music</a></p>`, { noindex: true });
+const bookingThanks = simple("/booking/thanks/", "Inquiry sent", "Inquiry sent", `<p>Got it. I’ll get back to you.</p><p><a class="btn" href="${B}/">Back home</a></p>`, { noindex: true });
 const privacy = simple("/privacy/", "Privacy", "Privacy", `
+${FORMS_ON ? "" : "<p><strong>Right now this site doesn’t collect anything:</strong> signups and booking requests aren’t open here yet. The notes below apply once they are.</p>"}
 <p>If you join the list, I keep your email and/or phone number to send you BarberRome music, show news and the unreleased drop. That’s it. I don’t sell it.</p>
 <h2>Texts</h2><p>If you add a number and check the box, you agree to get texts from BarberRome. Message frequency varies. Msg &amp; data rates may apply. Reply STOP to stop, HELP for help.</p>
 <h2>Booking</h2><p>Booking inquiries are only used to answer you.</p>
 <h2>Removal</h2><p>To get removed, reply STOP to a text, use the unsubscribe link in any email, or DM <a href="${esc(L.instagram)}">${esc(L.instagramHandle)}</a>.</p>
 <h2>Videos</h2><p>Videos play through YouTube’s privacy-enhanced embed and only load after you tap play.</p>`);
 const notFound = layout({ pathName: "/404.html", title: "Not found | BarberRome", description: site.description, noindex: true,
-  body: `<div class="wrap page"><h1>Wrong turn</h1><p>That page isn’t here.</p><p><a class="btn" href="/#music">Go to the music</a></p></div>` });
+  body: `<div class="wrap page"><h1>Wrong turn</h1><p>That page isn’t here.</p><p><a class="btn" href="${B}/#music">Go to the music</a></p></div>` });
 
 // ---- write -------------------------------------------------------------------
 fs.rmSync(OUT, { recursive: true, force: true });
@@ -487,8 +508,10 @@ const write = (rel, content) => { const p = path.join(OUT, rel); fs.mkdirSync(pa
 fs.cpSync(path.join(SRC, "assets"), path.join(OUT, "assets"), { recursive: true });
 write("index.html", home());
 tracks.forEach((t, i) => write(`tracks/${t.slug}/index.html`, trackPage(t, i)));
-write("join/thanks/index.html", joinThanks);
-write("booking/thanks/index.html", bookingThanks);
+if (FORMS_ON) {
+  write("join/thanks/index.html", joinThanks);
+  write("booking/thanks/index.html", bookingThanks);
+}
 write("privacy/index.html", privacy);
 write("404.html", notFound);
 const today = new Date().toISOString().slice(0, 10);
@@ -500,9 +523,7 @@ ${urls.map((u) => `  <url><loc>${abs(u)}</loc><lastmod>${today}</lastmod></url>`
 `);
 write("robots.txt", `User-agent: *
 Allow: /
-Disallow: /join/thanks/
-Disallow: /booking/thanks/
-
+${FORMS_ON ? `Disallow: ${B}/join/thanks/\nDisallow: ${B}/booking/thanks/\n` : ""}
 Sitemap: ${abs("/sitemap.xml")}
 `);
-console.log(`Built ${urls.length + 3} pages → ${path.relative(ROOT, OUT)}/  (SITE_URL=${SITE_URL}${DRAFT ? ", DRAFT" : ""})`);
+console.log(`Built ${urls.length + (FORMS_ON ? 3 : 1)} pages → ${path.relative(ROOT, OUT)}/  (SITE_URL=${SITE_URL}, base="${B}", forms=${FORMS}${DRAFT ? ", DRAFT" : ""})`);

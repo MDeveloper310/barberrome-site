@@ -6,7 +6,10 @@ import path from "node:path";
 import { execFileSync } from "node:child_process";
 import { fileURLToPath } from "node:url";
 const ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..");
-const DIST = path.join(ROOT, "dist");
+const DIST = path.join(ROOT, process.env.OUT_DIR || "dist");
+const SITE_URL = (process.env.SITE_URL || "http://localhost:8080").replace(/\/+$/, "");
+const BASE = new URL(SITE_URL).pathname.replace(/\/+$/, "");   // "" or e.g. "/barberrome-site"
+const FORMS_ON = (process.env.FORMS_MODE || "netlify") !== "disabled";
 const site = JSON.parse(fs.readFileSync(path.join(ROOT, "src/data/site.json"), "utf8"));
 let fails = 0, passes = 0;
 const ok = (cond, msg) => { if (cond) passes++; else { fails++; console.error("✗ " + msg); } };
@@ -20,7 +23,8 @@ const attr = (tag, name) => { const m = tag.match(new RegExp(`\\s${name}="([^"]*
 
 const resolveLocal = (href) => {
   const u = new URL(href, "http://x/");
-  let p = path.join(DIST, decodeURIComponent(u.pathname));
+  if (BASE && !(u.pathname === BASE || u.pathname.startsWith(BASE + "/"))) return null; // must live under the base path
+  let p = path.join(DIST, decodeURIComponent(u.pathname.slice(BASE.length) || "/"));
   if (u.pathname.endsWith("/")) p = path.join(p, "index.html");
   return fs.existsSync(p) ? { p, hash: u.hash.slice(1) } : null;
 };
@@ -69,6 +73,12 @@ for (const f of pages) {
     ok(action && resolveLocal(action), `${rel}: form action ${action} has no page`);
     if (name === "join") ok(/name="consent"[^>]*required/.test(form), `${rel}: join form needs explicit consent checkbox`);
   }
+  ok(html.includes(`<link rel="canonical" href="${SITE_URL}/`), `${rel}: canonical uses SITE_URL ${SITE_URL}`);
+  if (!FORMS_ON) {
+    ok(!/<form\b/.test(body), `${rel}: no <form> when forms are disabled`);
+    ok(!/data-netlify|\/join\/thanks\//.test(body), `${rel}: no Netlify form/thank-you wiring when disabled`);
+    ok(!/I’ll send you/.test(body), `${rel}: no reward promise when forms are disabled`);
+  }
   // iframes must not be in static HTML (embeds load on tap only)
   ok(!/<iframe/.test(body), `${rel}: static iframe found (embeds must load on interaction)`);
   ok(!/\bautoplay\b(?![^<]*muted)/.test(body.replace(/<video[^>]*muted[^>]*>/g, "")), `${rel}: autoplay without muted`);
@@ -87,7 +97,8 @@ ok(person && person.homeLocation.address.addressLocality === "Vallejo", "home: P
 ok(artist.track.length === 5, "home: 5 tracks in schema");
 // first scroll dual identity
 ok(/Barber since 12/.test(home) && /class="dual"/.test(home), "home: barber + rapper identity in first scroll");
-ok((home.match(/name="join"/g) || []).length >= 2, "home: join form in hero and after grid");
+if (FORMS_ON) ok((home.match(/name="join"/g) || []).length >= 2, "home: join form in hero and after grid");
+else ok((home.match(/data-forms-off="join"/g) || []).length >= 2 && home.includes('data-forms-off="booking"') && home.includes(site.links.instagram), "home: honest signup/booking notices with Instagram fallback");
 ok((home.match(/data-tile/g) || []).length === 5, "home: 5 track tiles");
 
 // streaming services (user-supplied artist URLs)
@@ -112,10 +123,10 @@ for (const t of JSON.parse(fs.readFileSync(path.join(ROOT, "src/data/tracks.json
 const sm = fs.readFileSync(path.join(DIST, "sitemap.xml"), "utf8");
 const smUrls = [...sm.matchAll(/<loc>([^<]+)<\/loc>/g)].map((m) => m[1]);
 ok(smUrls.length === 7, `sitemap: 7 URLs (got ${smUrls.length})`);
-for (const u of smUrls) ok(resolveLocal(new URL(u).pathname), `sitemap: ${u} has no page`);
+for (const u of smUrls) ok(u.startsWith(SITE_URL + "/") && resolveLocal(new URL(u).pathname), `sitemap: ${u} has no page / wrong host`);
 const robots = fs.readFileSync(path.join(DIST, "robots.txt"), "utf8");
-ok(/Sitemap: \S+\/sitemap\.xml/.test(robots), "robots: sitemap line");
-for (const p of ["join/thanks/index.html", "booking/thanks/index.html", "404.html"]) ok(/noindex/.test(fs.readFileSync(path.join(DIST, p), "utf8")), `${p}: noindex`);
+ok(robots.includes(`Sitemap: ${SITE_URL}/sitemap.xml`), "robots: sitemap line");
+for (const p of (FORMS_ON ? ["join/thanks/index.html", "booking/thanks/index.html", "404.html"] : ["404.html"])) ok(/noindex/.test(fs.readFileSync(path.join(DIST, p), "utf8")), `${p}: noindex`);
 
 // JS syntax
 for (const f of [...walk(path.join(ROOT, "src/assets/js")), ...walk(path.join(ROOT, "scripts")).filter((f) => f.endsWith(".mjs")), ...walk(path.join(ROOT, "netlify/functions"))]) {
