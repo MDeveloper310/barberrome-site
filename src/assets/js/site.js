@@ -316,6 +316,9 @@
     }
     function arm() { if (armed) return; armed = true; GESTURES.forEach(function (t) { d.addEventListener(t, onGesture, { capture: true, passive: true }); }); }
     audio.muted = get(MKEY) === "1";
+    if ("mediaSession" in navigator && w.MediaMetadata) {  // lock screen / control centre label
+      try { navigator.mediaSession.metadata = new MediaMetadata({ title: title, artist: "BarberRome" }); } catch (e) {}
+    }
     ["play", "pause", "volumechange"].forEach(function (t) { audio.addEventListener(t, ui); });
     audio.addEventListener("ended", function () { audio.currentTime = 0; start().catch(function () {}); }); // belt-and-braces for loop
     toggle.addEventListener("click", function () {

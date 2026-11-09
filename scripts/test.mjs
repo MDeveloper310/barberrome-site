@@ -191,6 +191,7 @@ for (const f of [...walk(path.join(ROOT, "src")), ...walk(path.join(ROOT, "scrip
 
 // background music loop (home)
 {
+  ok(/<span class="bgm__t">Show Mix<\/span>/.test(home) && /data-bgm-toggle[^>]*aria-label="Play Show Mix"/.test(home) && /<audio[^>]*title="Show Mix"/.test(home) && !/Rome Show/.test(home), "home: player labelled Show Mix (label, aria, audio title)");
   const a = (home.match(/<audio[^>]*data-bgm-audio[^>]*>/) || [""])[0];
   ok(/\sloop[\s>]/.test(a) && /preload="none"/.test(a) && !/\sautoplay/.test(a), "home: background <audio> has loop + preload=none (autoplay handled in JS)");
   const src = attr(a, "src") || "";

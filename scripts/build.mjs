@@ -360,7 +360,7 @@ function bgm() {
   if (!a || !a.src) return "";
   return `
 <aside class="bgm" data-bgm aria-label="Background music">
-  <audio data-bgm-audio loop preload="none" src="${B}${a.src}"></audio>
+  <audio data-bgm-audio loop preload="none" title="${esc(a.title)}" src="${B}${a.src}"></audio>
   <button type="button" class="bgm__play" data-bgm-toggle aria-pressed="false" aria-label="Play ${esc(a.title)}">
     <svg class="i-play" viewBox="0 0 24 24" aria-hidden="true"><path fill="currentColor" d="M7 4.5v15l13-7.5z"/></svg><svg class="i-pause" viewBox="0 0 24 24" aria-hidden="true"><path fill="currentColor" d="M6 4h4v16H6zM14 4h4v16h-4z"/></svg>
   </button>

@@ -119,7 +119,7 @@ Every site image is a hand-picked frame (no YouTube thumbnails), letterbox/sideb
 | hero mobile (under 700px wide) | photo supplied by owner — `source-media/owner/og-photo__supplied-by-owner.jpg`, crouched by the convertible (Nov 9, 2026) |
 | FUNKY FLOW tile | 4G-7JNXefeg ALL I KNOW @1:39 |
 | share image (og-barberrome, home + default) | photo supplied by owner — `source-media/owner/og-photo__supplied-by-owner.jpg` (Nov 8, 2026) |
-| home background loop (`assets/audio/rome-show.m4a`, “Rome Show”) | audio supplied by owner — original kept at `source-media/owner/rome-show-8-16-2026__supplied-by-owner.m4a` (Nov 8, 2026). Web copy: AAC 128 kbps stereo, −4.5 dB + limiter (original clipped), 11.1 MB, 11:00 |
+| home background loop (`assets/audio/rome-show.m4a`, shown as “Show Mix” (owner’s original file title “Rome Show 8-16-2026”)) | audio supplied by owner — original kept at `source-media/owner/rome-show-8-16-2026__supplied-by-owner.m4a` (Nov 8, 2026). Web copy: AAC 128 kbps stereo, −4.5 dB + limiter (original clipped), 11.1 MB, 11:00 |
 | FUNKY FLOW poster | 4G-7JNXefeg ALL I KNOW @1:21 |
 | TOP DOWN poster · card 03 | DpbIpMfDxnQ TOP DOWN shoot @1:17 |
 | PLAYAH WAY tile | ryC7cK5mD_8 PLAYAH WAY @0:36 |

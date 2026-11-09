@@ -127,6 +127,7 @@ for (const [w2, h2] of [[390, 844], [1440, 900]]) {
   await tap(p0[0], p0[1]);
   const st2 = await ev("(()=>{const a=document.querySelector('[data-bgm-audio]');return {paused:a.paused,label:document.querySelector('[data-bgm-status]').textContent,pressed:document.querySelector('[data-bgm-toggle]').getAttribute('aria-pressed')}})()");
   ok(!st2.paused && st2.label === "Now playing" && st2.pressed === "true", `bgm ${w2}px: first tap starts the loop`);
+  ok(await ev("document.querySelector('.bgm__t').textContent==='Show Mix' && getComputedStyle(document.querySelector('.bgm__t')).textTransform==='uppercase' && document.querySelector('[data-bgm-toggle]').getAttribute('aria-label')==='Pause Show Mix' && (!navigator.mediaSession || !navigator.mediaSession.metadata || navigator.mediaSession.metadata.title==='Show Mix')"), `bgm ${w2}px: labelled SHOW MIX (aria + media session)`);
   ok(await ev("document.documentElement.scrollWidth<=window.innerWidth+1"), `bgm ${w2}px: no horizontal overflow with the player`);
   if (w2 === 390) await shot("e2e-bgm-mobile"); else await shot("e2e-bgm-desktop");
   // mute + pause via keyboard-operable buttons, pause remembered across reload

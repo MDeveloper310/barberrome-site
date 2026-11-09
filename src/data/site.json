@@ -46,7 +46,7 @@
   "backgroundAudio": {
     "_note": "Audio supplied by owner (\"Rome Show 8-16-2026\", Barber Rome). Re-encoded AAC 128 kbps; original in source-media/owner/. Loops on the home page; set src to null to turn it off.",
     "src": "/assets/audio/rome-show.m4a",
-    "title": "Rome Show"
+    "title": "Show Mix"
   },
   "reward": {
     "label": "an unreleased cut or a voice note from the shop",
