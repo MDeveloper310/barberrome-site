@@ -64,7 +64,8 @@ JOBS.update({
 })
 PENDING = []
 
-MAROON = np.array([0.43, 0.11, 0.14]); GOLD = np.array([0.80, 0.65, 0.32])
+MAROON = np.array([0.43, 0.11, 0.14]); GOLD = np.array([0.80, 0.65, 0.32])   # grade tones (photos)
+ACCENT = (232, 134, 42)   # UI accent orange (#e8862a) for tags, rules, OG wordmark
 
 def grade(im, fade=0.0, exposure=0.80, seed=7):
     a = np.asarray(im).astype(np.float32) / 255.0
@@ -95,7 +96,7 @@ def tag(im, text):
     pad = s // 2
     x = im.width - tw - pad * 3; y = pad * 2
     d.rectangle([x - pad, y - pad // 2, x + tw + pad, y + s + pad // 2], fill=(14, 14, 14))
-    d.rectangle([x - pad, y - pad // 2, x - pad + max(2, s // 6), y + s + pad // 2], fill=(201, 164, 76))
+    d.rectangle([x - pad, y - pad // 2, x - pad + max(2, s // 6), y + s + pad // 2], fill=ACCENT)
     d.text((x + pad // 2, y - s * 0.08), text, font=f, fill=(243, 240, 234))
     return im
 
@@ -103,7 +104,7 @@ def accent(im):
     """thin gold rule along the bottom-left — the site's 'gold line' detail"""
     d = ImageDraw.Draw(im)
     t = max(2, im.width // 360)
-    d.rectangle([0, im.height - t, int(im.width * 0.28), im.height], fill=(201, 164, 76))
+    d.rectangle([0, im.height - t, int(im.width * 0.28), im.height], fill=ACCENT)
     return im
 
 def save(im, base, w):
@@ -136,8 +137,8 @@ def og():
     sm = ImageFont.truetype(str(FONT / "barlow-condensed-600.woff2"), 30)
     d.text((660, 300), "BARBER", font=big, fill=(243, 240, 234))
     d.text((660, 400), "ROME", font=big, fill=(243, 240, 234))
-    d.text((660, 400), "R", font=big, fill=(201, 164, 76))
-    d.rectangle([660, 540, 700, 544], fill=(201, 164, 76))
+    d.text((660, 400), "R", font=big, fill=ACCENT)
+    d.rectangle([660, 540, 700, 544], fill=ACCENT)
     d.text((712, 523), "BAY AREA RAP  ·  SF → VALLEJO", font=sm, fill=(210, 205, 196))
     im.save(OUT / "og-barberrome.jpg", "JPEG", quality=84, optimize=True, progressive=True)
     return im
@@ -155,7 +156,7 @@ if __name__ == "__main__":
         rowh = [max(t.height for _, t in layout[i:i+4]) + 40 for i in range(0, len(layout), 4)]
         S = Image.new("RGB", (W, sum(rowh) + 80), (20, 20, 20)); d = ImageDraw.Draw(S)
         f = ImageFont.truetype(str(FONT / "barlow-condensed-600.woff2"), 26)
-        d.text((14, 20), "BarberRome · final replacement images (graded, all slots) — " + str(len(cells)) + " assets", font=ImageFont.truetype(str(FONT / "barlow-condensed-600.woff2"), 20), fill=(201, 164, 76))
+        d.text((14, 20), "BarberRome · final replacement images (graded, all slots) — " + str(len(cells)) + " assets", font=ImageFont.truetype(str(FONT / "barlow-condensed-600.woff2"), 20), fill=ACCENT)
         y = 70
         for r, i in enumerate(range(0, len(layout), 4)):
             for k, (n, t) in enumerate(layout[i:i+4]):
