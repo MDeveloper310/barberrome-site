@@ -382,7 +382,7 @@ function home() {
       <source media="(max-width: 699px)" type="image/webp" srcset="${B}/assets/img/hero-tall-480.webp 480w, ${B}/assets/img/hero-tall-640.webp 640w" sizes="100vw">
       <source media="(max-width: 699px)" srcset="${B}/assets/img/hero-tall-480.jpg 480w, ${B}/assets/img/hero-tall-640.jpg 640w" sizes="100vw">
       <source type="image/webp" srcset="${B}/assets/img/hero-wide-640.webp 640w, ${B}/assets/img/hero-wide-960.webp 960w, ${B}/assets/img/hero-wide-1280.webp 1280w, ${B}/assets/img/hero-wide-1920.webp 1920w" sizes="100vw">
-      <img src="${B}/assets/img/hero-wide-1280.jpg" srcset="${B}/assets/img/hero-wide-640.jpg 640w, ${B}/assets/img/hero-wide-960.jpg 960w, ${B}/assets/img/hero-wide-1280.jpg 1280w, ${B}/assets/img/hero-wide-1920.jpg 1920w" sizes="100vw" width="1280" height="720" fetchpriority="high" alt="A black Mustang 5.0 convertible with a red top and gold wire wheels parked by a sunny park.">
+      <img src="${B}/assets/img/hero-wide-1280.jpg" srcset="${B}/assets/img/hero-wide-640.jpg 640w, ${B}/assets/img/hero-wide-960.jpg 960w, ${B}/assets/img/hero-wide-1280.jpg 1280w, ${B}/assets/img/hero-wide-1920.jpg 1920w" sizes="100vw" width="1280" height="720" fetchpriority="high" alt="A black Mustang 5.0 convertible with a red top and gold wire wheels. On phones: BarberRome in a red cap and sunglasses, crouched beside the convertible.">
     </picture>`;
   const body = `
 <section class="hero" aria-labelledby="h1">

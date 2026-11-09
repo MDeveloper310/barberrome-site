@@ -141,6 +141,16 @@ for (const [w2, h2] of [[390, 844], [1440, 900]]) {
   ok(await ev("document.querySelector('[data-bgm-audio]').paused"), `bgm ${w2}px: after a pause, taps don't restart it`);
   await ev("localStorage.clear()");
 }
+// mobile: the player never covers the hero buttons; the phone hero is the crouch photo
+for (const [w2, h2] of [[360, 640], [390, 664]]) {
+  await go(BASE + "/", { width: w2, height: h2 }); await sleep(500);
+  const r = await ev(`(()=>{const b=document.querySelector('[data-bgm]');const tucked=b.classList.contains('is-tucked');const p=b.getBoundingClientRect();const hit=[...document.querySelectorAll('.ctas .btn')].some(e=>{const q=e.getBoundingClientRect();return q.left<p.right&&q.right>p.left&&q.top<p.bottom&&q.bottom>p.top});return {tucked,hit,src:document.querySelector('.hero__media img').currentSrc}})()`);
+  ok(r.tucked || !r.hit, `bgm ${w2}x${h2}: player is out of the way of the hero buttons`);
+  ok(/hero-tall-\d+\.(webp|jpg)/.test(r.src), `hero ${w2}px: phone hero image in use (${r.src.split("/").pop()})`);
+  await ev("scrollTo(0, 900)"); await sleep(400);
+  ok(!(await ev("document.querySelector('[data-bgm]').classList.contains('is-tucked')")), `bgm ${w2}x${h2}: player comes back once the buttons scroll past`);
+}
+
 // a video play pauses the loop
 await go(BASE + "/", { width: 390, height: 844 });
 { const p0 = await ev("(()=>{const r=document.querySelector('#about p').getBoundingClientRect();return [r.left+20,r.top+10]})()"); await tap(p0[0], p0[1]); }

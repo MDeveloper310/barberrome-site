@@ -330,8 +330,22 @@
       if (e.target.closest && e.target.closest("[data-play],[data-facade]")) BGM.yield();
     }, true);
     // tuck away while typing on small screens so it never covers a field or submit button
-    d.addEventListener("focusin", function (e) { if (w.innerWidth < 700 && e.target.matches("input,textarea,select")) box.classList.add("is-tucked"); });
-    d.addEventListener("focusout", function () { box.classList.remove("is-tucked"); });
+    // never sit on top of a button or form field: slide out of the way while one is under it (or while typing on a phone)
+    var AVOID = ".ctas .btn, [data-player-root] [data-play], form input, form textarea, form select, form button";
+    var typing = false, raf = 0;
+    function place() {
+      raf = 0;
+      var x = box.offsetLeft - 8, y = box.offsetTop - 8, x2 = x + box.offsetWidth + 16, y2 = y + box.offsetHeight + 16; // offset* ignores the tuck transform
+      var hit = typing;
+      if (!hit) { var els = d.querySelectorAll(AVOID); for (var i = 0; i < els.length && !hit; i++) { var r = els[i].getBoundingClientRect(); hit = r.width > 0 && r.left < x2 && r.right > x && r.top < y2 && r.bottom > y; } }
+      if (hit && box.contains(d.activeElement)) hit = typing;   // don't yank it away from a keyboard user mid-use
+      box.classList.toggle("is-tucked", hit);
+    }
+    function queue() { if (!raf) raf = w.requestAnimationFrame(place); }
+    w.addEventListener("scroll", queue, { passive: true }); w.addEventListener("resize", queue);
+    d.addEventListener("focusin", function (e) { typing = w.innerWidth < 700 && e.target.matches("input,textarea,select"); queue(); });
+    d.addEventListener("focusout", function () { typing = false; queue(); });
+    w.addEventListener("load", queue); queue();
     ui();
     if (get(KEY) === "paused") return;              // they paused it before: leave it alone
     start().then(function () { track("bgm_start", { via: "autoplay" }); }).catch(function () { arm(); ui(); });

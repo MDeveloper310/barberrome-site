@@ -26,13 +26,14 @@ F_CAR  = "hero-wide__qIjw-tHmnQU_0m12s.jpg"         # black 5.0 convertible, gol
 F_DRV  = "driver-car__qIjw-tHmnQU_0m55s.jpg"        # driver, top down, red leather (California livin')
 F_PW20 = "playah-way__ryC7cK5mD_8_0m20s.jpg"        # PLAYAH WAY, mural + Jungle Life sign, wide
 F_PW36 = "playah-way__ryC7cK5mD_8_0m36s.jpg"        # PLAYAH WAY, SF-cap man close, friend behind
+F_CROUCH = ROOT / "source-media" / "owner" / "og-photo__supplied-by-owner.jpg"  # owner photo (1536x2048): crouched by the convertible
 F_ASTRO= "top-down-mood__DpbIpMfDxnQ_1m17s.jpg"     # TOP DOWN Astro shoot, back to camera, light tubes
 
 # name: dict(src, box=(l,t,r,b) in the 1920x1080 frame, widths, fade=bottom darkening 0..1,
 #            tag=small source label or None, ratio check only for sanity)
 JOBS = {
     "hero-wide":       dict(src=F_CAR,  box=(0, 0, 1920, 1080),   widths=[640, 960, 1280, 1920], fade=0.0,  tag=None, exposure=0.86),
-    "hero-tall":       dict(src=F_ART,  box=(300, 0, 940, 1080),  widths=[480, 640],        fade=0.0,  tag=None, exposure=0.88),
+    "hero-tall":       dict(src=F_CROUCH, box=(466, 540, 1414, 2140), widths=[480, 640],    fade=0.0,  tag=None, exposure=0.96),  # mobile hero: owner's crouch photo
     "tile-top-down":   dict(src=F_DRV,  box=(180, 0, 1260, 1080), widths=[360, 720],             fade=0.55, tag="STILL · CALIFORNIA LIVIN'"),
     "tile-playah-way": dict(src=F_PW36, box=(840, 0, 1920, 1080), widths=[360, 720],             fade=0.55, tag="PLAYAH WAY · VIDEO"),
     "tile-funky-flow": dict(src=F_ART,  box=(260, 0, 1340, 1080), widths=[360, 720],             fade=0.55, tag="STILL · ALL I KNOW VIDEO"),
@@ -114,7 +115,14 @@ def save(im, base, w):
     r.save(OUT / f"{base}-{w}.jpg", "JPEG", quality=78, optimize=True, progressive=True)
 
 def build(name, j):
-    im = Image.open(SRC / j["src"]).convert("RGB").crop(j["box"])
+    src = Image.open(SRC / j["src"]).convert("RGB")
+    l, t, r, btm = j["box"]
+    if btm > src.height:   # box runs past the bottom: extend with a darkened mirror of the ground (sits under the hero's dark fade + text)
+        ext = btm - src.height
+        strip = src.crop((0, src.height - ext, src.width, src.height)).transpose(Image.FLIP_TOP_BOTTOM)
+        strip = Image.eval(strip, lambda v: int(v * 0.45))
+        big = Image.new("RGB", (src.width, btm)); big.paste(src, (0, 0)); big.paste(strip, (0, src.height)); src = big
+    im = src.crop(j["box"])
     top = max(j["widths"])
     im = im.resize((top, round(im.height * top / im.width)), Image.LANCZOS)
     im = grade(im, fade=j.get("fade", 0), exposure=j.get("exposure", 0.80))

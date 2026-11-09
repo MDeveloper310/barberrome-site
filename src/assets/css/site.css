@@ -302,7 +302,7 @@ p{margin:0 0 1em}
 .grid>li:not(:first-child) .tile .playbtn{width:40px;height:40px}
 .grid>li:not(:first-child) .tile__body{padding:.6rem;gap:.4rem}
 .cap-tall{display:none}
-@media(max-width:699px){.cap-wide{display:none}.cap-tall{display:inline}.hero__media img{object-position:50% 12%}}
+@media(max-width:699px){.cap-wide{display:none}.cap-tall{display:inline}.hero__media img{object-position:50% 0;transform-origin:50% 0}.hero__in{padding-top:max(5rem,58vw)}}
 @media(max-width:420px){.nav a:nth-child(2){display:none}}
 .tile__top{position:relative}
 .dest{font:400 .72rem/1 var(--body);letter-spacing:0;text-transform:none;color:var(--ink-3);margin-left:.3em}
