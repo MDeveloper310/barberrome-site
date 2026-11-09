@@ -33,7 +33,7 @@ F_ASTRO= "top-down-mood__DpbIpMfDxnQ_1m17s.jpg"     # TOP DOWN Astro shoot, back
 #            tag=small source label or None, ratio check only for sanity)
 JOBS = {
     "hero-wide":       dict(src=F_CAR,  box=(0, 0, 1920, 1080),   widths=[640, 960, 1280, 1920], fade=0.0,  tag=None, exposure=0.86),
-    "hero-tall":       dict(src=F_CROUCH, box=(466, 540, 1414, 2140), widths=[480, 640],    fade=0.0,  tag=None, exposure=0.96),  # mobile hero: owner's crouch photo
+    "hero-tall":       dict(src=F_CAR,  box=(40, 240, 1462, 2640), widths=[480, 640],     fade=0.0,  tag=None, exposure=0.90),  # phone hero: same California livin' car as desktop; car framed above the headline
     "tile-top-down":   dict(src=F_DRV,  box=(180, 0, 1260, 1080), widths=[360, 720],             fade=0.55, tag="STILL · CALIFORNIA LIVIN'"),
     "tile-playah-way": dict(src=F_PW36, box=(840, 0, 1920, 1080), widths=[360, 720],             fade=0.55, tag="PLAYAH WAY · VIDEO"),
     "tile-funky-flow": dict(src=F_ART,  box=(260, 0, 1340, 1080), widths=[360, 720],             fade=0.55, tag="STILL · ALL I KNOW VIDEO"),
