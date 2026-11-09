@@ -113,7 +113,7 @@ ok(!/(since|at|was) 12\b/.test(home), "home: no leftover 'since 12' (owner's bio
   const txt = [...sec.matchAll(/<(?:h2|p)[^>]*>([\s\S]*?)<\/(?:h2|p)>/g)].map((m) => decode(m[1].replace(/<[^>]+>/g, "")).trim()).filter((t) => t !== "About");
   const want = [site.bio.headline, ...site.bio.paragraphs, site.bio.tagline];
   ok(sec && JSON.stringify(txt) === JSON.stringify(want), `home: About bio renders verbatim (${txt.length}/${want.length} blocks)`);
-  ok(home.indexOf('id="about"') > home.indexOf('id="chair-to-mic"') && home.indexOf('id="music"') < home.indexOf('id="about"'), "home: About sits after music and the story rail");
+  ok(home.indexOf('class="hero"') < home.indexOf('id="about"') && home.indexOf('id="about"') < home.indexOf('class="dual"') && home.indexOf('id="about"') < home.indexOf('id="music"'), "home: About is the first section after the hero (before the Barber/Rapper strip and music)");
 }
 if (FORMS_ON) ok((home.match(/name="join"/g) || []).length >= 2, "home: join form in hero and after grid");
 else ok((home.match(/data-forms-off="join"/g) || []).length >= 2 && home.includes('data-forms-off="booking"') && home.includes(site.links.instagram), "home: honest signup/booking notices with Instagram fallback");

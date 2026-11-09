@@ -390,6 +390,19 @@ function home() {
   </div>
 </section>
 
+<section class="sec bio" id="about" aria-labelledby="bio-h">
+  <div class="wrap bio__in">
+    <div class="bio__head">
+      <p class="eyebrow">About</p>
+      <h2 id="bio-h">${site.bio.headline.split(" ").map((w) => `<span>${esc(w)}</span>`).join(" ")}</h2>
+    </div>
+    <div class="bio__body">
+      ${site.bio.paragraphs.map((p, i, a) => `<p${i === 0 ? ' class="bio__lead"' : i === a.length - 1 ? ' class="bio__close"' : ""}>${esc(p)}</p>`).join("\n      ")}
+      <p class="bio__tag">${esc(site.bio.tagline)}</p>
+    </div>
+  </div>
+</section>
+
 <section class="dual" aria-label="Barber and rapper">
   <div class="dual__item dual__item--chair">
     ${pic("id-chair", [405, 640], "A barber in an SF cap and pink shirt fades a client's hair with red clippers in a sunlit shop.", { sizes: "(min-width:800px) 21vw, 50vw", w: 405, h: 506, lazy: false })}
@@ -439,18 +452,6 @@ function home() {
   </ol>
 </section>
 
-<section class="sec bio" id="about" aria-labelledby="bio-h">
-  <div class="wrap bio__in">
-    <div class="bio__head">
-      <p class="eyebrow">About</p>
-      <h2 id="bio-h">${site.bio.headline.split(" ").map((w) => `<span>${esc(w)}</span>`).join(" ")}</h2>
-    </div>
-    <div class="bio__body">
-      ${site.bio.paragraphs.map((p, i, a) => `<p${i === 0 ? ' class="bio__lead"' : i === a.length - 1 ? ' class="bio__close"' : ""}>${esc(p)}</p>`).join("\n      ")}
-      <p class="bio__tag">${esc(site.bio.tagline)}</p>
-    </div>
-  </div>
-</section>
 `;
   return layout({ pathName: "/", title: site.title, description: site.description, body, jsonld: [artistLd], preload });
 }
