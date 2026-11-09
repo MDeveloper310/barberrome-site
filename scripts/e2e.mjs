@@ -8,7 +8,7 @@ const BASE = process.env.BASE || "http://localhost:8080";
 const SHOTS = process.env.SHOTS || "";
 const FORMS_ON = (process.env.FORMS_MODE || "netlify") !== "disabled";
 const port = 9300 + Math.floor(Math.random() * 500);
-const chrome = spawn(CHROME, ["--headless=new", "--no-sandbox", "--disable-gpu", "--hide-scrollbars", `--remote-debugging-port=${port}`, "--user-data-dir=/tmp/br-e2e-" + port, "about:blank"], { stdio: "ignore" });
+const chrome = spawn(CHROME, ["--headless=new", "--no-sandbox", "--disable-gpu", "--hide-scrollbars", "--autoplay-policy=user-gesture-required", `--remote-debugging-port=${port}`, "--user-data-dir=/tmp/br-e2e-" + port, "about:blank"], { stdio: "ignore" });
 const sleep = (ms) => new Promise((r) => setTimeout(r, ms));
 let fails = 0, passes = 0;
 const ok = (c, m) => { if (c) { passes++; console.log("✓ " + m); } else { fails++; console.error("✗ " + m); } };
@@ -113,6 +113,40 @@ else ok(await ev("document.querySelectorAll('form').length===0 && !!document.que
 await go(BASE + "/", { width: 1440, height: 900 });
 ok(await ev("document.documentElement.scrollWidth<=window.innerWidth+1"), "no horizontal overflow at 1440px");
 await shot("e2e-desktop");
+
+// background music loop (real browser autoplay policy: sound needs a user gesture)
+const tap = async (x, y) => { for (const type of ["mousePressed", "mouseReleased"]) await send("Input.dispatchMouseEvent", { type, x, y, button: "left", clickCount: 1 }); await sleep(600); };
+for (const [w2, h2] of [[390, 844], [1440, 900]]) {
+  await go(BASE + "/", { width: w2, height: h2 });
+  await ev("localStorage.clear()"); await go(BASE + "/", { width: w2, height: h2 });
+  const st = await ev(`(()=>{const a=document.querySelector('[data-bgm-audio]'),b=document.querySelector('[data-bgm]').getBoundingClientRect();return {loop:a.loop,paused:a.paused,label:document.querySelector('[data-bgm-status]').textContent,inView:b.left>=0&&b.right<=innerWidth&&b.bottom<=innerHeight}})()`);
+  ok(st.loop && st.paused && st.label === "Tap to play" && st.inView, `bgm ${w2}px: loop set, blocked autoplay waits for a tap, player on screen`);
+  await ev("scrollTo(0, 1400)"); await sleep(400);
+  ok(await ev("document.querySelector('[data-bgm-audio]').paused"), `bgm ${w2}px: scrolling alone does not start it`);
+  const p0 = await ev("(()=>{const r=document.querySelector('#about p').getBoundingClientRect();return [r.left+20,r.top+10]})()");
+  await tap(p0[0], p0[1]);
+  const st2 = await ev("(()=>{const a=document.querySelector('[data-bgm-audio]');return {paused:a.paused,label:document.querySelector('[data-bgm-status]').textContent,pressed:document.querySelector('[data-bgm-toggle]').getAttribute('aria-pressed')}})()");
+  ok(!st2.paused && st2.label === "Now playing" && st2.pressed === "true", `bgm ${w2}px: first tap starts the loop`);
+  ok(await ev("document.documentElement.scrollWidth<=window.innerWidth+1"), `bgm ${w2}px: no horizontal overflow with the player`);
+  if (w2 === 390) await shot("e2e-bgm-mobile"); else await shot("e2e-bgm-desktop");
+  // mute + pause via keyboard-operable buttons, pause remembered across reload
+  await ev("document.querySelector('[data-bgm-mute]').click()");
+  ok(await ev("document.querySelector('[data-bgm-audio]').muted && document.querySelector('[data-bgm-mute]').getAttribute('aria-label')==='Unmute music'"), `bgm ${w2}px: mute toggles`);
+  await ev("document.querySelector('[data-bgm-mute]').click()");
+  await ev("document.querySelector('[data-bgm-toggle]').focus()");
+  await send("Input.dispatchKeyEvent", { type: "keyDown", key: "Enter", code: "Enter", windowsVirtualKeyCode: 13, text: "\r" }); await send("Input.dispatchKeyEvent", { type: "keyUp", key: "Enter", code: "Enter", windowsVirtualKeyCode: 13 }); await sleep(300);
+  ok(await ev("document.querySelector('[data-bgm-audio]').paused && localStorage.getItem('br-bgm')==='paused'"), `bgm ${w2}px: Enter on the button pauses and remembers it`);
+  await go(BASE + "/", { width: w2, height: h2 });
+  await tap(p0[0], p0[1]);
+  ok(await ev("document.querySelector('[data-bgm-audio]').paused"), `bgm ${w2}px: after a pause, taps don't restart it`);
+  await ev("localStorage.clear()");
+}
+// a video play pauses the loop
+await go(BASE + "/", { width: 390, height: 844 });
+{ const p0 = await ev("(()=>{const r=document.querySelector('#about p').getBoundingClientRect();return [r.left+20,r.top+10]})()"); await tap(p0[0], p0[1]); }
+const started = !(await ev("document.querySelector('[data-bgm-audio]').paused"));
+await ev("document.querySelector('.hero [data-play]').click()"); await sleep(400);
+ok(started && await ev("document.querySelector('[data-bgm-audio]').paused && localStorage.getItem('br-bgm')===null"), "bgm: starting a video pauses the loop (without saving a pause)");
 
 console.log(`\n${passes} passed, ${fails} failed`);
 ws.close(); chrome.kill();

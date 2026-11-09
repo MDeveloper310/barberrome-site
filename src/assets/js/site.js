@@ -3,6 +3,7 @@
 (function () {
   "use strict";
   var d = document, w = window;
+  var BGM = null; // background loop controller (set below when the home page has one)
   var CFG = w.BR_CONFIG || {};
 
   /* ---------- analytics placeholder ---------- */
@@ -56,6 +57,7 @@
       var root = f.closest("[data-player-root]");
       if (!root) return;
       var playing = state === 1;
+      if (playing && BGM) BGM.yield();
       root.classList.toggle("is-playing", playing);
       root.setAttribute("data-state", playing ? "playing" : "paused");
       var hero = root.closest(".hero");
@@ -273,6 +275,67 @@
       }).then(function () { btn.disabled = false; });
     });
   });
+
+  /* ---------- background music loop (home) ----------
+     Autoplay with sound is blocked by most browsers until the visitor interacts, so: try play() on load;
+     if that's refused, start on the first real gesture (tap/click/key). Scrolling is not a gesture.
+     A visitor's pause/mute choice is remembered in localStorage. Video plays pause the loop. */
+  (function () {
+    var box = d.querySelector("[data-bgm]"); if (!box) return;
+    var audio = box.querySelector("[data-bgm-audio]");
+    var toggle = box.querySelector("[data-bgm-toggle]");
+    var mute = box.querySelector("[data-bgm-mute]");
+    var status = box.querySelector("[data-bgm-status]");
+    var title = box.querySelector(".bgm__t").textContent;
+    var KEY = "br-bgm", MKEY = "br-bgm-muted";
+    function get(k) { try { return localStorage.getItem(k); } catch (e) { return null; } }
+    function set(k, v) { try { v === null ? localStorage.removeItem(k) : localStorage.setItem(k, v); } catch (e) {} }
+    var GESTURES = ["pointerup", "pointerdown", "mousedown", "touchend", "keydown", "click"];
+    var armed = false, yielded = false;
+    function ui() {
+      var on = !audio.paused;
+      box.classList.toggle("is-playing", on);
+      toggle.setAttribute("aria-pressed", on ? "true" : "false");
+      toggle.setAttribute("aria-label", (on ? "Pause " : "Play ") + title);
+      status.textContent = on ? "Now playing" : (yielded ? "Paused for video" : "Tap to play");
+      box.classList.toggle("is-muted", audio.muted);
+      mute.setAttribute("aria-pressed", audio.muted ? "true" : "false");
+      mute.setAttribute("aria-label", audio.muted ? "Unmute music" : "Mute music");
+    }
+    function start() {
+      var p; try { p = audio.play(); } catch (e) { return Promise.reject(e); }
+      return p && p.then ? p : Promise.resolve();
+    }
+    function disarm() { if (!armed) return; armed = false; GESTURES.forEach(function (t) { d.removeEventListener(t, onGesture, true); }); }
+    function onGesture(e) {
+      if (e.type === "keydown" && e.key === "Escape") return;
+      if (box.contains(e.target)) { disarm(); return; }            // the player's own buttons handle themselves
+      if (e.target.closest && e.target.closest("[data-play],[data-facade],[data-expand],iframe,video")) { disarm(); return; } // they're starting a video
+      if (get(KEY) === "paused") { disarm(); return; }
+      start().then(function () { disarm(); track("bgm_start", { via: "gesture" }); }).catch(function () {});
+    }
+    function arm() { if (armed) return; armed = true; GESTURES.forEach(function (t) { d.addEventListener(t, onGesture, { capture: true, passive: true }); }); }
+    audio.muted = get(MKEY) === "1";
+    ["play", "pause", "volumechange"].forEach(function (t) { audio.addEventListener(t, ui); });
+    audio.addEventListener("ended", function () { audio.currentTime = 0; start().catch(function () {}); }); // belt-and-braces for loop
+    toggle.addEventListener("click", function () {
+      yielded = false;
+      if (audio.paused) { set(KEY, null); disarm(); start().then(function () { track("bgm_start", { via: "button" }); }).catch(ui); }
+      else { audio.pause(); set(KEY, "paused"); disarm(); track("bgm_pause", {}); }
+    });
+    mute.addEventListener("click", function () { audio.muted = !audio.muted; set(MKEY, audio.muted ? "1" : null); });
+    // pause (without remembering it) when a video starts
+    BGM = { yield: function () { if (!audio.paused) { yielded = true; audio.pause(); } disarm(); } };
+    d.addEventListener("click", function (e) {
+      if (e.target.closest && e.target.closest("[data-play],[data-facade]")) BGM.yield();
+    }, true);
+    // tuck away while typing on small screens so it never covers a field or submit button
+    d.addEventListener("focusin", function (e) { if (w.innerWidth < 700 && e.target.matches("input,textarea,select")) box.classList.add("is-tucked"); });
+    d.addEventListener("focusout", function () { box.classList.remove("is-tucked"); });
+    ui();
+    if (get(KEY) === "paused") return;              // they paused it before: leave it alone
+    start().then(function () { track("bgm_start", { via: "autoplay" }); }).catch(function () { arm(); ui(); });
+  })();
 
   /* ---------- chair-to-mic rail controls ---------- */
   d.querySelectorAll("[data-rail]").forEach(function (rail) {

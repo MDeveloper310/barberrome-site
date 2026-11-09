@@ -320,3 +320,27 @@ p{margin:0 0 1em}
 .bio__body .bio__close{color:var(--ink);font:700 clamp(1.25rem,3vw,1.55rem)/1.3 var(--head);letter-spacing:.02em;border-left:3px solid var(--gold);padding-left:.9rem;margin-top:1.6em}
 .bio__tag{font:800 clamp(1rem,2.6vw,1.25rem)/1 var(--head)!important;letter-spacing:.24em;color:var(--gold-2)!important;margin-top:1.4em!important}
 @media(min-width:900px){.bio__in{grid-template-columns:minmax(0,.8fr) minmax(0,1.2fr);gap:4rem;align-items:start}.bio__head{position:sticky;top:5.5rem}}
+
+/* background music mini player (home) */
+.bgm{position:fixed;z-index:55;right:max(.75rem,env(safe-area-inset-right));bottom:calc(.75rem + env(safe-area-inset-bottom));display:flex;align-items:center;gap:.55rem;padding:.35rem .4rem .35rem .35rem;background:rgba(20,20,20,.94);border:1px solid var(--line);border-left:3px solid var(--gold);border-radius:999px;box-shadow:0 10px 30px rgba(0,0,0,.45);color:var(--ink);max-width:calc(100vw - 1.5rem);transition:transform .25s var(--ease),opacity .25s}
+@supports (backdrop-filter:blur(6px)){.bgm{background:rgba(20,20,20,.82);backdrop-filter:blur(8px)}}
+.bgm button{flex:none;display:grid;place-items:center;border:0;border-radius:50%;cursor:pointer;padding:0}
+.bgm button svg{width:18px;height:18px}
+.bgm__play{width:40px;height:40px;background:var(--gold);color:#141414}
+.bgm__play:hover{background:var(--gold-2)}
+.bgm__mute{width:34px;height:34px;background:transparent;color:var(--ink-2)}
+.bgm__mute:hover{color:var(--ink)}
+.bgm .i-pause,.bgm .i-mute{display:none}
+.bgm.is-playing .i-play{display:none}.bgm.is-playing .i-pause{display:block}
+.bgm.is-muted .i-vol{display:none}.bgm.is-muted .i-mute{display:block}
+.bgm__txt{display:flex;flex-direction:column;line-height:1.05;min-width:0}
+.bgm__k{font:600 .62rem/1 var(--head);letter-spacing:.18em;text-transform:uppercase;color:var(--gold-2)}
+.bgm__t{font:800 1rem/1.1 var(--head);letter-spacing:.04em;text-transform:uppercase;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.bgm__eq{display:flex;align-items:flex-end;gap:2px;height:14px;width:12px}
+.bgm__eq i{flex:1;height:30%;background:var(--gold);border-radius:1px}
+.bgm.is-playing .bgm__eq i{animation:bgm-eq .9s ease-in-out infinite alternate}
+.bgm.is-playing .bgm__eq i:nth-child(2){animation-delay:-.3s}.bgm.is-playing .bgm__eq i:nth-child(3){animation-delay:-.6s}
+@keyframes bgm-eq{from{height:25%}to{height:100%}}
+.bgm.is-tucked{transform:translateY(calc(100% + 1.5rem));opacity:0;pointer-events:none}
+body:has(.bgm) .foot{padding-bottom:calc(2rem + 64px + env(safe-area-inset-bottom))}
+@media(prefers-reduced-motion:reduce){.bgm,.bgm.is-playing .bgm__eq i{animation:none;transition:none}.bgm.is-playing .bgm__eq i{height:70%}}

@@ -353,6 +353,24 @@ const CARDS = [
   { step: "05", h: "Now", p: "PLAYAH WAY, FUNKY FLOW, DOMINAMOR. Still cutting. Still recording.", img: "card-now", widths: [400, 640], alt: "A man in an SF cap and black track jacket talks to the camera outside the Jungle Life studio, its green 1804 sign and painted gorilla behind him.", cap: "PLAYAH WAY video" }
 ];
 
+// background loop (home page): <audio loop>, autoplay attempt + first-gesture fallback in site.js
+function bgm() {
+  const a = site.backgroundAudio;
+  if (!a || !a.src) return "";
+  return `
+<aside class="bgm" data-bgm aria-label="Background music">
+  <audio data-bgm-audio loop preload="none" src="${B}${a.src}"></audio>
+  <button type="button" class="bgm__play" data-bgm-toggle aria-pressed="false" aria-label="Play ${esc(a.title)}">
+    <svg class="i-play" viewBox="0 0 24 24" aria-hidden="true"><path fill="currentColor" d="M7 4.5v15l13-7.5z"/></svg><svg class="i-pause" viewBox="0 0 24 24" aria-hidden="true"><path fill="currentColor" d="M6 4h4v16H6zM14 4h4v16h-4z"/></svg>
+  </button>
+  <span class="bgm__txt"><span class="bgm__k" data-bgm-status>Tap to play</span><span class="bgm__t">${esc(a.title)}</span></span>
+  <span class="bgm__eq" aria-hidden="true"><i></i><i></i><i></i></span>
+  <button type="button" class="bgm__mute" data-bgm-mute aria-pressed="false" aria-label="Mute music">
+    <svg class="i-vol" viewBox="0 0 24 24" aria-hidden="true"><path fill="currentColor" d="M4 9v6h4l5 4V5L8 9zm12.5 3a4.5 4.5 0 0 0-2.5-4v8a4.5 4.5 0 0 0 2.5-4z"/></svg><svg class="i-mute" viewBox="0 0 24 24" aria-hidden="true"><path fill="currentColor" d="M4 9v6h4l5 4V5L8 9zm11.3-.7 1.4-1.4L19 9.2l2.3-2.3 1.4 1.4L20.4 10.6l2.3 2.3-1.4 1.4L19 12l-2.3 2.3-1.4-1.4 2.3-2.3z"/></svg>
+  </button>
+</aside>`;
+}
+
 function home() {
   const preload = `<link rel="preload" as="image" type="image/webp" media="(max-width: 699px)" imagesrcset="${B}/assets/img/hero-tall-480.webp 480w, ${B}/assets/img/hero-tall-640.webp 640w" imagesizes="100vw">
 <link rel="preload" as="image" type="image/webp" media="(min-width: 700px)" imagesrcset="${B}/assets/img/hero-wide-960.webp 960w, ${B}/assets/img/hero-wide-1280.webp 1280w, ${B}/assets/img/hero-wide-1920.webp 1920w" imagesizes="100vw">
@@ -452,6 +470,7 @@ function home() {
   </ol>
 </section>
 
+${bgm()}
 `;
   return layout({ pathName: "/", title: site.title, description: site.description, body, jsonld: [artistLd], preload });
 }
@@ -546,9 +565,10 @@ fs.rmSync(OUT, { recursive: true, force: true });
 // cache-bust images: every /assets/img/<file> reference in HTML gets ?v=<content hash>, so replaced photos
 // with the same file name are re-fetched instead of served from a stale browser/CDN cache.
 const IMG_V = new Map();
-const imgV = (html) => html.replace(/\/assets\/img\/([A-Za-z0-9._-]+\.(?:jpg|webp|png))(?![?\w.])/g, (m, f) => {
-  if (!IMG_V.has(f)) IMG_V.set(f, hashFile(`assets/img/${f}`));
-  return `/assets/img/${f}?v=${IMG_V.get(f)}`;
+const imgV = (html) => html.replace(/\/assets\/(img|audio)\/([A-Za-z0-9._-]+\.(?:jpg|webp|png|m4a))(?![?\w.])/g, (m, dir, f) => {
+  const k = `${dir}/${f}`;
+  if (!IMG_V.has(k)) IMG_V.set(k, hashFile(`assets/${k}`));
+  return `/assets/${k}?v=${IMG_V.get(k)}`;
 });
 const write = (rel, content) => { const p = path.join(OUT, rel); fs.mkdirSync(path.dirname(p), { recursive: true }); fs.writeFileSync(p, rel.endsWith(".html") ? imgV(content) : content); };
 fs.cpSync(path.join(SRC, "assets"), path.join(OUT, "assets"), { recursive: true });

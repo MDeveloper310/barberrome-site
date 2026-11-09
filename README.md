@@ -118,6 +118,7 @@ Every site image is a hand-picked frame (no YouTube thumbnails), letterbox/sideb
 | TOP DOWN tile · BAY PLAY poster | qIjw-tHmnQU “California livin’” @0:55 |
 | hero mobile · FUNKY FLOW tile | 4G-7JNXefeg ALL I KNOW @1:39 |
 | share image (og-barberrome, home + default) | photo supplied by owner — `source-media/owner/og-photo__supplied-by-owner.jpg` (Nov 8, 2026) |
+| home background loop (`assets/audio/rome-show.m4a`, “Rome Show”) | audio supplied by owner — original kept at `source-media/owner/rome-show-8-16-2026__supplied-by-owner.m4a` (Nov 8, 2026). Web copy: AAC 128 kbps stereo, −4.5 dB + limiter (original clipped), 11.1 MB, 11:00 |
 | FUNKY FLOW poster | 4G-7JNXefeg ALL I KNOW @1:21 |
 | TOP DOWN poster · card 03 | DpbIpMfDxnQ TOP DOWN shoot @1:17 |
 | PLAYAH WAY tile | ryC7cK5mD_8 PLAYAH WAY @0:36 |
@@ -129,3 +130,9 @@ Every site image is a hand-picked frame (no YouTube thumbnails), letterbox/sideb
 | Rapper strip · card 04 | 7mh39MPtp_A NorthStar Studio, Vallejo @0:24 |
 
 User-supplied facts used in copy: from SF, lives in Vallejo, barbering since 11 (corrected from 12 per the owner's bio), the full About bio (`site.bio` in `src/data/site.json`, verbatim: IV Barber Lounge opened in Vallejo in 2012, husband and father), opened for Rappin' 4-Tay, Instagram @barberrome. No footage of the 4-Tay show turned up, so that card uses a NorthStar Studio (Vallejo) performance still and its caption says NorthStar.
+
+## Background music (home page)
+
+`backgroundAudio` in `src/data/site.json` sets the file and title. The home page has an `<audio loop preload="none">` and a small player in the bottom-right corner.
+Browsers don't allow sound to start by itself, so the script tries to play on load and, if that's refused, starts on the visitor's first tap, click or keypress (scrolling doesn't count).
+Pause and mute choices are saved per visitor (`localStorage` keys `br-bgm`, `br-bgm-muted`), and starting a video pauses the loop. To remove it, delete `backgroundAudio` from site.json.

@@ -173,6 +173,22 @@ for (const f of [...walk(path.join(ROOT, "src")), ...walk(path.join(ROOT, "scrip
   ok(refs > 0 && bad.length === 0, `all ${refs} image refs are versioned with their content hash` + (bad.length ? ` — bad: ${bad.slice(0, 5).join(", ")}` : ""));
 }
 
+// background music loop (home)
+{
+  const a = (home.match(/<audio[^>]*data-bgm-audio[^>]*>/) || [""])[0];
+  ok(/\sloop[\s>]/.test(a) && /preload="none"/.test(a) && !/\sautoplay/.test(a), "home: background <audio> has loop + preload=none (autoplay handled in JS)");
+  const src = attr(a, "src") || "";
+  const m = src.match(/\/assets\/audio\/([\w.-]+\.m4a)\?v=([0-9a-f]{8})$/);
+  const f = m && path.join(DIST, "assets/audio", m[1]);
+  ok(m && fs.existsSync(f) && crypto.createHash("sha1").update(fs.readFileSync(f)).digest("hex").slice(0, 8) === m[2] && src.startsWith(BASE + "/assets/audio/"), `home: audio src is versioned and exists (${src})`);
+  ok(f && fs.existsSync(f) && fs.statSync(f).size < 14 * 1024 * 1024, "home: loop file < 14 MB");
+  ok(/data-bgm-toggle[^>]*aria-label="Play /.test(home) && /data-bgm-mute[^>]*aria-label="Mute music"/.test(home) && /<aside class="bgm"[^>]*aria-label="Background music"/.test(home), "home: mini player has labelled play + mute buttons");
+  const js = fs.readFileSync(path.join(DIST, "assets/js/site.js"), "utf8");
+  ok(/GESTURES\s*=\s*\[[^\]]*"pointerup"[^\]]*"touchend"[^\]]*"keydown"/.test(js) && /\.catch\(function \(\) \{ arm\(\)/.test(js), "js: autoplay refusal falls back to first tap/click/key");
+  ok(/localStorage\.setItem/.test(js) && /"br-bgm"/.test(js), "js: pause choice remembered");
+  for (const rel of pages.map((f) => path.relative(DIST, f)).filter((r) => r !== "index.html")) ok(!/data-bgm/.test(fs.readFileSync(path.join(DIST, rel), "utf8")), `${rel}: no background player (home only)`);
+}
+
 // page weight budget
 const kb = (f) => fs.statSync(f).size / 1024;
 ok(kb(path.join(DIST, "assets/js/site.js")) < 20, "site.js < 20 KB");
