@@ -27,7 +27,7 @@ jobs:
         uses: actions/configure-pages@v5
       - name: Build and test
         env:
-          SITE_URL: ${{ steps.pages.outputs.base_url }}
+          SITE_URL: https://barberrome.com   # custom domain (Pages settings); pinned so canonical/OG never pick up http:// before the cert
           FORMS_MODE: formsubmit
         run: npm test
       - uses: actions/upload-pages-artifact@v3

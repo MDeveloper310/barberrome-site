@@ -6,9 +6,9 @@ Lyrics and hook lines are out for now at the owner's request; they are not a lau
 
 ## Must do before going live
 
-The site is live on GitHub Pages (https://mdeveloper310.github.io/barberrome-site/) with signups and booking switched off there. Items below are what's left for a full launch.
+The site is live at https://barberrome.com (GitHub Pages, custom domain). Forms post to FormSubmit, still waiting for the inbox owner's activation. Items below are what's left for a full launch.
 
-- [ ] **Domain.** Set `SITE_URL` (Netlify env) or `siteUrl` in `src/data/site.json`. Until then canonical/OG/sitemap use the fallback host. Rebuild after.
+- [x] **Domain.** barberrome.com (Porkbun) → GitHub Pages; `siteUrl` and the workflow `SITE_URL` are https://barberrome.com. Optional: verify the domain in GitHub account settings → Pages (TXT `_github-pages-challenge-mdeveloper310`) to block takeovers. If you deploy on Netlify instead, set `SITE_URL` there.
 - [ ] **Forms backend.** GitHub Pages forms post to FormSubmit → iv.forthepeople@gmail.com. Pending: one submission to request the activation email, the owner clicks it, then set `forms.formsubmitActive: true` and push. Other options: Deploy on Netlify (forms are auto-detected) and turn on form notifications, **or** switch `forms.mode` to `function` and set `SUBSCRIBE_WEBHOOK_URL` / `BOOKING_WEBHOOK_URL`. Send a real test submission from the live site.
 - [ ] **Email/SMS list.** Decide where contacts end up (Laylo, Mailchimp, Community, a sheet). If you text people, use an SMS provider that handles STOP/HELP and consent records. The checkbox wording is on the forms and in `/privacy/`.
 - [ ] **Unreleased reward.** `reward.url` is null. Upload the unreleased cut / shop voice note somewhere private (unlisted SoundCloud, Dropbox link, a hidden page) and set `reward.url`. Until then the thank-you message says it isn't posted yet. Note: a URL shown on the thank-you page can be shared; for a gated file, email it from your list tool instead.

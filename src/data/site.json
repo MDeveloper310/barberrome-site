@@ -1,6 +1,6 @@
 {
   "_comment": "Site-wide config. Anything null is intentionally unset — see RELEASE-CHECKLIST.md. SITE_URL env var (or Netlify's URL) overrides siteUrl at build time.",
-  "siteUrl": null,
+  "siteUrl": "https://barberrome.com",
   "artistName": "BarberRome",
   "alternateNames": [
     "BarberROME",

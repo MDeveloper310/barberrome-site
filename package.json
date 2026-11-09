@@ -13,8 +13,8 @@
     "preview": "node scripts/build.mjs && node scripts/preview.mjs",
     "test": "node scripts/build.mjs && node scripts/test.mjs",
     "images": "python3 scripts/images.py",
-    "build:pages": "SITE_URL=https://mdeveloper310.github.io/barberrome-site FORMS_MODE=formsubmit node scripts/build.mjs",
-    "test:pages": "SITE_URL=https://mdeveloper310.github.io/barberrome-site FORMS_MODE=formsubmit npm test",
-    "test:pages-disabled": "SITE_URL=https://mdeveloper310.github.io/barberrome-site FORMS_MODE=disabled npm test"
+    "build:pages": "SITE_URL=https://barberrome.com FORMS_MODE=formsubmit node scripts/build.mjs",
+    "test:pages": "SITE_URL=https://barberrome.com FORMS_MODE=formsubmit npm test",
+    "test:pages-disabled": "SITE_URL=https://barberrome.com FORMS_MODE=disabled npm test"
   }
 }

@@ -8,11 +8,12 @@ import { execFileSync } from "node:child_process";
 import { fileURLToPath } from "node:url";
 const ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..");
 const DIST = path.join(ROOT, process.env.OUT_DIR || "dist");
-const SITE_URL = (process.env.SITE_URL || "http://localhost:8080").replace(/\/+$/, "");
+const site = JSON.parse(fs.readFileSync(path.join(ROOT, "src/data/site.json"), "utf8"));
+const SITE_URL = (process.env.SITE_URL || site.siteUrl || process.env.URL || "http://localhost:8080")  // same order as build.mjs
+  .replace(/\/+$/, "");
 const BASE = new URL(SITE_URL).pathname.replace(/\/+$/, "");   // "" or e.g. "/barberrome-site"
 const FORMS_ON = (process.env.FORMS_MODE || "netlify") !== "disabled";
 const FS = process.env.FORMS_MODE === "formsubmit";
-const site = JSON.parse(fs.readFileSync(path.join(ROOT, "src/data/site.json"), "utf8"));
 let fails = 0, passes = 0;
 const ok = (cond, msg) => { if (cond) passes++; else { fails++; console.error("✗ " + msg); } };
 
