@@ -127,4 +127,4 @@ Every site image is a hand-picked frame (no YouTube thumbnails), letterbox/sideb
 | footer Vallejo | 0ckDgRi7iXw “IV, Vallejo CA” @0:44 (middle panel) |
 | Rapper strip · card 04 | 7mh39MPtp_A NorthStar Studio, Vallejo @0:24 |
 
-User-supplied facts used in copy: from SF, lives in Vallejo, barbering since 12, opened for Rappin' 4-Tay, Instagram @barberrome. No footage of the 4-Tay show turned up, so that card uses a NorthStar Studio (Vallejo) performance still and its caption says NorthStar.
+User-supplied facts used in copy: from SF, lives in Vallejo, barbering since 11 (corrected from 12 per the owner's bio), the full About bio (`site.bio` in `src/data/site.json`, verbatim: IV Barber Lounge opened in Vallejo in 2012, husband and father), opened for Rappin' 4-Tay, Instagram @barberrome. No footage of the 4-Tay show turned up, so that card uses a NorthStar Studio (Vallejo) performance still and its caption says NorthStar.

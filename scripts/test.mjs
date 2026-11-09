@@ -106,7 +106,15 @@ ok(artist.sameAs.includes("https://www.instagram.com/barberrome/"), "home: Insta
 ok(person && person.homeLocation.address.addressLocality === "Vallejo", "home: Person homeLocation Vallejo");
 ok(artist.track.length === 5, "home: 5 tracks in schema");
 // first scroll dual identity
-ok(/Barber since 12/.test(home) && /class="dual"/.test(home), "home: barber + rapper identity in first scroll");
+ok(/Barber since 11/.test(home) && /class="dual"/.test(home), "home: barber + rapper identity in first scroll");
+ok(!/(since|at|was) 12\b/.test(home), "home: no leftover 'since 12' (owner's bio says 11)");
+{ // About section: owner-supplied bio, verbatim, after the story rail
+  const sec = (home.match(/<section class="sec bio" id="about"[\s\S]*?<\/section>/) || [""])[0];
+  const txt = [...sec.matchAll(/<(?:h2|p)[^>]*>([\s\S]*?)<\/(?:h2|p)>/g)].map((m) => decode(m[1].replace(/<[^>]+>/g, "")).trim()).filter((t) => t !== "About");
+  const want = [site.bio.headline, ...site.bio.paragraphs, site.bio.tagline];
+  ok(sec && JSON.stringify(txt) === JSON.stringify(want), `home: About bio renders verbatim (${txt.length}/${want.length} blocks)`);
+  ok(home.indexOf('id="about"') > home.indexOf('id="chair-to-mic"') && home.indexOf('id="music"') < home.indexOf('id="about"'), "home: About sits after music and the story rail");
+}
 if (FORMS_ON) ok((home.match(/name="join"/g) || []).length >= 2, "home: join form in hero and after grid");
 else ok((home.match(/data-forms-off="join"/g) || []).length >= 2 && home.includes('data-forms-off="booking"') && home.includes(site.links.instagram), "home: honest signup/booking notices with Instagram fallback");
 ok((home.match(/data-tile/g) || []).length === 5, "home: 5 track tiles");

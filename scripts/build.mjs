@@ -166,7 +166,7 @@ function layout({ pathName, title, description, body, ogImage, ogType = "website
     formsMode: FORMS, basePath: B, joinFunction: site.forms.joinFunction, bookingFunction: site.forms.bookingFunction,
     rewardUrl: site.reward.url, rewardLabel: site.reward.label, instagramHandle: L.instagramHandle
   };
-  const nav = [["Music", "/#music"], ["Chair to Mic", "/#chair-to-mic"], ["Join", "/#join"], ["Book", "/#book"]];
+  const nav = [["Music", "/#music"], ["Chair to Mic", "/#chair-to-mic"], ["About", "/#about"], ["Join", "/#join"], ["Book", "/#book"]];
   return `<!doctype html>
 <html lang="en">
 <head>
@@ -346,7 +346,7 @@ function tile(t, i) {
 }
 
 const CARDS = [
-  { step: "01", h: "The chair", p: "I picked up clippers at 12. Been cutting ever since.", img: "card-chair", widths: [400, 640], alt: "A barber's tattooed hand, wearing gold and red bracelets, holds a flat black tool to a client's hairline in a shop.", cap: "From “The IV experience”" },
+  { step: "01", h: "The chair", p: "I picked up clippers at 11. Been cutting ever since.", img: "card-chair", widths: [400, 640], alt: "A barber's tattooed hand, wearing gold and red bracelets, holds a flat black tool to a client's hairline in a shop.", cap: "From “The IV experience”" },
   { step: "02", h: "SF → Vallejo", p: "San Francisco raised me. Vallejo is home now.", img: "card-roots", widths: [400, 640], alt: "A man in a black beanie and a red-and-white jacket stands under the Taylor St and Market St signs in San Francisco, a traffic light and tall old buildings behind him.", cap: "Taylor & Market, SF" },
   { step: "03", h: "First releases", p: "TOP DOWN came out August 2025. BAY PLAY followed that November.", img: "card-releases", widths: [400, 640], alt: "A man in a black bucket hat, sunglasses and a puffer jacket stands under angled neon light tubes on a dark video set.", cap: "TOP DOWN video shoot" },
   { step: "04", h: "Opened for 4-Tay", p: "I opened for Rappin’ 4-Tay.", img: "card-stage", widths: [400, 640], alt: "A performer in a red cap and red jacket raps into a handheld mic on a dim stage at NorthStar Studio in Vallejo.", cap: "Pictured: NorthStar Studio, Vallejo" },
@@ -375,7 +375,7 @@ function home() {
         <p class="eyebrow">Bay Area hip-hop</p>
         <h1 class="wordmark" id="h1"><span>Barber</span><span class="rome">Rome</span></h1>
         <ul class="ident" aria-label="About">
-          <li>Barber since 12</li><li>Rapper</li><li>SF <span class="arrow" aria-hidden="true">→</span><span class="visually-hidden">to</span> Vallejo</li>
+          <li>Barber since 11</li><li>Rapper</li><li>SF <span class="arrow" aria-hidden="true">→</span><span class="visually-hidden">to</span> Vallejo</li>
         </ul>
         <div class="ctas">
           <a class="btn" href="#listen" data-stream-open data-placement="hero">${ICON.play} Stream</a>
@@ -393,7 +393,7 @@ function home() {
 <section class="dual" aria-label="Barber and rapper">
   <div class="dual__item dual__item--chair">
     ${pic("id-chair", [405, 640], "A barber in an SF cap and pink shirt fades a client's hair with red clippers in a sunlit shop.", { sizes: "(min-width:800px) 21vw, 50vw", w: 405, h: 506, lazy: false })}
-    <div class="dual__txt"><p class="eyebrow">The chair</p><h2>Barber</h2><p>Cutting hair since I was 12. Still in the shop.</p></div>
+    <div class="dual__txt"><p class="eyebrow">The chair</p><h2>Barber</h2><p>Cutting hair since I was 11. Still in the shop.</p></div>
   </div>
   <div class="dual__item">
     ${pic("card-stage", [400, 640], "A performer in a red cap and red jacket raps into a handheld mic on a dim stage at NorthStar Studio in Vallejo.", { sizes: "(min-width:800px) 21vw, 50vw", w: 400, h: 500, lazy: false })}
@@ -437,6 +437,19 @@ function home() {
       <div class="card__body"><span class="card__step">${c.step}</span><h3>${esc(c.h)}</h3><p>${esc(c.p)}</p></div>
     </li>`).join("\n    ")}
   </ol>
+</section>
+
+<section class="sec bio" id="about" aria-labelledby="bio-h">
+  <div class="wrap bio__in">
+    <div class="bio__head">
+      <p class="eyebrow">About</p>
+      <h2 id="bio-h">${site.bio.headline.split(" ").map((w) => `<span>${esc(w)}</span>`).join(" ")}</h2>
+    </div>
+    <div class="bio__body">
+      ${site.bio.paragraphs.map((p, i, a) => `<p${i === 0 ? ' class="bio__lead"' : i === a.length - 1 ? ' class="bio__close"' : ""}>${esc(p)}</p>`).join("\n      ")}
+      <p class="bio__tag">${esc(site.bio.tagline)}</p>
+    </div>
+  </div>
 </section>
 `;
   return layout({ pathName: "/", title: site.title, description: site.description, body, jsonld: [artistLd], preload });
