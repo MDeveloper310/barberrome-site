@@ -18,12 +18,12 @@ Set the real domain before launch: `SITE_URL=https://your-domain.com npm run bui
 
 ## Deploy (GitHub Pages — live now)
 
-Live: **https://barberrome.com/** (custom domain on GitHub Pages; `www` redirects to the apex, and the old https://mdeveloper310.github.io/barberrome-site/ URLs are redirected by GitHub). Domain registered at Porkbun; DNS: four `A` records on `@` → 185.199.108.153 / .109.153 / .110.153 / .111.153, `www` CNAME → `mdeveloper310.github.io`.
+Live: **http://barberrome.com/** (https once GitHub issues the certificate) (custom domain on GitHub Pages; `www` redirects to the apex, and the old https://mdeveloper310.github.io/barberrome-site/ URLs are redirected by GitHub). Domain registered at Porkbun; DNS: four `A` records on `@` → 185.199.108.153 / .109.153 / .110.153 / .111.153, `www` CNAME → `mdeveloper310.github.io`.
 
-- `.github/workflows/pages.yml` runs on every push to `main`: checkout → `actions/configure-pages` → `npm test` with `SITE_URL=https://barberrome.com` (pinned) and `FORMS_MODE=formsubmit` → `upload-pages-artifact` → `deploy-pages`. Build job has `contents: read`; only the deploy job gets `pages: write` + `id-token: write`.
+- `.github/workflows/pages.yml` runs on every push to `main`: checkout → `actions/configure-pages` → `npm test` with `SITE_URL=http://barberrome.com` (pinned; switch to https:// once the cert exists) and `FORMS_MODE=formsubmit` → `upload-pages-artifact` → `deploy-pages`. Build job has `contents: read`; only the deploy job gets `pages: write` + `id-token: write`.
 - Base path comes from `SITE_URL`: the generator takes its path (empty at barberrome.com; `/barberrome-site` if built for the project URL) and prefixes every internal link, asset, srcset and form action with it; canonical/OG/sitemap use the full URL. At a domain root (Netlify, custom domain) the base is empty. CSS uses relative font URLs.
 - **Forms are off on Pages** (no backend there): the join and booking areas show "not open on this site yet" plus a DM @barberrome on Instagram button. No `<form>` is rendered, no thank-you pages are built, and no reward is promised. To take signups, deploy on Netlify (below) or set `FORMS_MODE=function` with your own endpoint.
-- `robots.txt` and `sitemap.xml` are served at the domain root (https://barberrome.com/robots.txt).
+- `robots.txt` and `sitemap.xml` are served at the domain root (http://barberrome.com/robots.txt).
 - Local preview of the Pages build: `npm run build:pages && PORT=8081 node scripts/preview.mjs` → http://localhost:8081/ ; tests: `npm run test:pages`, and `BASE=http://localhost:8081 FORMS_MODE=formsubmit node scripts/e2e.mjs`.
 - Custom domain: set in repo Settings → Pages (`cname: barberrome.com`, no CNAME file needed with a workflow build). If the domain ever changes, update `SITE_URL` in the workflow, `siteUrl` in `src/data/site.json` and the `package.json` scripts.
 
@@ -45,7 +45,7 @@ Activation (needs the owner, one time):
 Limits: free tier, third-party processing, reCAPTCHA page between submit and thank-you, no list management (it's email notifications, not a mailing list). For a real list later, point the forms at a list tool (Laylo, Mailchimp, etc.) or use Netlify + the functions relay.
 
 Tests never submit in this mode (`scripts/e2e.mjs` only checks wiring), because any POST to FormSubmit sends real mail.
-To check the build locally: `SITE_URL=https://barberrome.com FORMS_MODE=formsubmit FORMSUBMIT_ENDPOINT=https://formsubmit.co/iv.forthepeople@gmail.com npm test`.
+To check the build locally: `SITE_URL=http://barberrome.com FORMS_MODE=formsubmit FORMSUBMIT_ENDPOINT=https://formsubmit.co/iv.forthepeople@gmail.com npm test`.
 
 ## Deploy (Netlify — for working forms)
 

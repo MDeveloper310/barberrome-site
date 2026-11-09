@@ -27,7 +27,7 @@ jobs:
         uses: actions/configure-pages@v5
       - name: Build and test
         env:
-          SITE_URL: https://barberrome.com   # custom domain (Pages settings); pinned so canonical/OG never pick up http:// before the cert
+          SITE_URL: http://barberrome.com   # custom domain. http until GitHub issues the HTTPS cert (it currently serves a *.github.io cert, so https:// og:image/og:url fail in iMessage/Facebook/X). Flip to https:// in site.json, package.json and here once https_enforced=true.
           FORMS_MODE: formsubmit
         run: npm test
       - uses: actions/upload-pages-artifact@v3

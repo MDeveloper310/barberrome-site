@@ -58,7 +58,7 @@ for (const f of pages) {
   // internal links + anchors
   for (const m of body.matchAll(/\shref="([^"]+)"/g)) {
     const href = decode(m[1]);
-    if (/^(https?:|mailto:|tel:)/.test(href)) { if (href.startsWith("http:") && !href.includes("localhost")) ok(false, `${rel}: insecure link ${href}`); continue; }
+    if (/^(https?:|mailto:|tel:)/.test(href)) { if (href.startsWith("http:") && !href.includes("localhost") && !href.startsWith(SITE_URL + "/")) ok(false, `${rel}: insecure link ${href}`); continue; }
     const target = href.startsWith("#") ? { p: f, hash: href.slice(1) } : resolveLocal(href);
     ok(target, `${rel}: broken internal link ${href}`);
     if (target && target.hash) ok(fs.readFileSync(target.p, "utf8").includes(`id="${target.hash}"`), `${rel}: missing anchor ${href}`);
@@ -171,6 +171,15 @@ for (const f of [...walk(path.join(ROOT, "src")), ...walk(path.join(ROOT, "scrip
     }
   }
   ok(refs > 0 && bad.length === 0, `all ${refs} image refs are versioned with their content hash` + (bad.length ? ` — bad: ${bad.slice(0, 5).join(", ")}` : ""));
+}
+
+// share image: same URL for og + twitter, on the same scheme as the live site, typed + sized
+{
+  const og = (home.match(/<meta property="og:image" content="([^"]+)"/) || [])[1] || "";
+  const tw = (home.match(/<meta name="twitter:image" content="([^"]+)"/) || [])[1] || "";
+  ok(og && og === tw && og.startsWith(SITE_URL + "/assets/img/og-barberrome.jpg?v="), `home: og:image === twitter:image on the site origin (${og})`);
+  ok(/og:image:type" content="image\/jpeg"/.test(home) && /og:image:width" content="1200"/.test(home) && /og:image:height" content="630"/.test(home) && /og:image:alt" content="[^"]+"/.test(home), "home: og:image type/size/alt present");
+  ok(SITE_URL.startsWith("https:") || !/og:image:secure_url/.test(home), "home: no https secure_url advertised while the site runs on http");
 }
 
 // background music loop (home)

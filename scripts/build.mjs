@@ -182,6 +182,7 @@ ${noindex ? '<meta name="robots" content="noindex, follow">\n' : ""}<meta name="
 <meta property="og:description" content="${esc(description)}">
 <meta property="og:url" content="${canonical}">
 <meta property="og:image" content="${abs(img.url)}">
+${abs(img.url).startsWith("https:") ? `<meta property="og:image:secure_url" content="${abs(img.url)}">\n` : ""}<meta property="og:image:type" content="image/${/\.png(\?|$)/.test(img.url) ? "png" : "jpeg"}">
 <meta property="og:image:width" content="${img.w}">
 <meta property="og:image:height" content="${img.h}">
 <meta property="og:image:alt" content="${esc(img.alt)}">
