@@ -182,8 +182,9 @@ for (const f of [...walk(path.join(ROOT, "src")), ...walk(path.join(ROOT, "scrip
   ok(SITE_URL.startsWith("https:") || !/og:image:secure_url/.test(home), "home: no https secure_url advertised while the site runs on http");
 }
 
-// hero: both breakpoints use the California livin' car still; caption says so. Share image is the owner crouch photo.
-ok(/<span class="cap-tall">Still from the “California livin’” video<\/span>/.test(home) && /<span class="cap-wide">Still from the “California livin’” video<\/span>/.test(home), "hero: mobile + desktop captions credit the California livin' still");
+// hero: desktop = California livin' car; mobile = owner crouch photo. Share image is also the crouch photo.
+ok(/<span class="cap-wide">Still from the “California livin’” video<\/span>/.test(home) && /<span class="cap-tall">Photo supplied by BarberRome<\/span>/.test(home), "hero: desktop credits California livin'; mobile credits owner photo");
+ok(/On phones: BarberRome crouching beside his 5.0 convertible/.test(home), "hero img alt names the crouch photo on phones");
 ok(/og:image:alt" content="BarberRome beside the 5.0 convertible"/.test(home), "home: og/twitter alt describes owner crouch photo beside the 5.0");
 
 // wordmark: whole ROME orange, BARBER off-white

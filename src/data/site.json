@@ -41,7 +41,7 @@
     "loopVideo": null,
     "loopVideoNote": "Optional: path to a 6–10s muted MP4 (H.264, <1.5 MB) cut from cruise footage, e.g. /assets/video/hero-loop.mp4",
     "stillCaption": "Still from the “California livin’” video",
-    "stillCaptionMobile": "Still from the “California livin’” video"
+    "stillCaptionMobile": "Photo supplied by BarberRome"
   },
   "backgroundAudio": {
     "_note": "Audio supplied by owner (\"Rome Show 8-16-2026\", Barber Rome). Re-encoded AAC 128 kbps; original in source-media/owner/. Loops on the home page; set src to null to turn it off.",
