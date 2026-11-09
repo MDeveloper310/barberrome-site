@@ -42,7 +42,8 @@ JOBS = {
 }
 # Stage 2: vertical shorts (675x1200 panel cut out of the 1920x1200 capture's black sidebars)
 F_PERF = "performance-overlook__4G-7JNXefeg_1m21s.jpg"   # ALL I KNOW, light cap, back three-quarter, rooftops
-F_COMB = "barber-detail__DecpFaNtjew_0m44s.jpg"           # "The IV experience" — comb + tattooed hand
+F_COMB = "barber-detail__DecpFaNtjew_0m44s.jpg"           # "The IV experience" — comb + tattooed hand (kept; unused by card-chair)
+F_CHAIR = ROOT / "source-media" / "owner" / "chair-iv-cut__supplied-by-owner.jpg"  # owner photo: outdoor cut under blue canopy, IV mark
 F_TOOL = "barber-tools__0ckDgRi7iXw_0m44s.jpg"            # "IV, Vallejo CA" — 3 stacked clipper panels
 F_SHOP = "barber-work__0ckDgRi7iXw_0m22s.jpg"             # "IV, Vallejo CA" — SF-cap barber cutting
 F_TAY  = "location-taylor-market__mjeLuNKwtP8_0m20s.jpg"  # "TAYLOR & MARKET" short — signs + man
@@ -54,7 +55,7 @@ JOBS.update({
     "poster-bay-play":   dict(src=F_DRV,  box=(0, 0, 1920, 1080),    widths=[640, 960, 1280], fade=0.25, tag=TAG_CAL),
     "poster-funky-flow": dict(src=F_PERF, box=(0, 0, 1920, 1080),    widths=[640, 960, 1280], fade=0.25, tag=TAG_AIK),
     "poster-dominamor":  dict(src=F_CAR,  box=(0, 180, 1440, 990),   widths=[640, 960, 1280], fade=0.25, tag=TAG_CAL),
-    "card-chair":  dict(src=F_COMB, box=(0, 330, 675, 1174), widths=[400, 640], fade=0.35, tag=None),
+    "card-chair":  dict(src=F_CHAIR, box=(0, 0, 1186, 1483), widths=[400, 640], fade=0.35, tag=None, exposure=0.90),  # owner outdoor IV cut: face, clippers, boy; IV kept bottom-right
     "card-roots":  dict(src=F_TAY,  box=(0, 150, 675, 994),  widths=[400, 640], fade=0.35, tag=None),
     "card-stage":  dict(src=F_NSTR, box=(0, 50, 675, 894),  widths=[400, 640], fade=0.35, tag=None),
     "card-now":    dict(src=F_PW20, box=(640, 0, 1504, 1080), widths=[400, 640], fade=0.35, tag=None),
@@ -114,7 +115,8 @@ def save(im, base, w):
     r.save(OUT / f"{base}-{w}.jpg", "JPEG", quality=78, optimize=True, progressive=True)
 
 def build(name, j):
-    src = Image.open(SRC / j["src"]).convert("RGB")
+    src_path = j["src"] if isinstance(j["src"], Path) else SRC / j["src"]
+    src = Image.open(src_path).convert("RGB")
     l, t, r, btm = j["box"]
     if btm > src.height:   # box runs past the bottom: continue the ground as a plain gradient into the page background (sits under the hero's dark fade + text)
         ext = btm - src.height

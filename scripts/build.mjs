@@ -347,7 +347,7 @@ function tile(t, i) {
 }
 
 const CARDS = [
-  { step: "01", h: "The chair", p: "I picked up clippers at 11. Been cutting ever since.", img: "card-chair", widths: [400, 640], alt: "A barber's tattooed hand, wearing gold and red bracelets, holds a flat black tool to a client's hairline in a shop.", cap: "From “The IV experience”" },
+  { step: "01", h: "The chair", p: "I picked up clippers at 11. Been cutting ever since.", img: "card-chair", widths: [400, 640], alt: "BarberRome cutting a young client's hair outdoors", cap: "IV Barber Lounge" },
   { step: "02", h: "SF → Vallejo", p: "San Francisco raised me. Vallejo is home now.", img: "card-roots", widths: [400, 640], alt: "A man in a black beanie and a red-and-white jacket stands under the Taylor St and Market St signs in San Francisco, a traffic light and tall old buildings behind him.", cap: "Taylor & Market, SF" },
   { step: "03", h: "First releases", p: "TOP DOWN came out August 2025. BAY PLAY followed that November.", img: "card-releases", widths: [400, 640], alt: "A man in a black bucket hat, sunglasses and a puffer jacket stands under angled neon light tubes on a dark video set.", cap: "TOP DOWN video shoot" },
   { step: "04", h: "Opened for 4-Tay", p: "I opened for Rappin’ 4-Tay.", img: "card-stage", widths: [400, 640], alt: "A performer in a red cap and red jacket raps into a handheld mic on a dim stage at NorthStar Studio in Vallejo.", cap: "Pictured: NorthStar Studio, Vallejo" },

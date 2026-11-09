@@ -125,7 +125,7 @@ Every site image is a hand-picked frame (no YouTube thumbnails), letterbox/sideb
 | PLAYAH WAY tile | ryC7cK5mD_8 PLAYAH WAY @0:36 |
 | PLAYAH WAY poster · card 05 | ryC7cK5mD_8 PLAYAH WAY @0:20 |
 | BAY PLAY tile (also the hero player cover) · card 02 · footer SF | mjeLuNKwtP8 “TAYLOR & MARKET📍” short @0:20 |
-| card 01 | DecpFaNtjew “The IV experience 💈” @0:44 |
+| card 01 | Owner-supplied outdoor cut photo (IV Barber Lounge; original in `source-media/owner/chair-iv-cut__supplied-by-owner.jpg`) |
 | Barber strip | 0ckDgRi7iXw “IV, Vallejo CA” @0:22 |
 | footer Vallejo | 0ckDgRi7iXw “IV, Vallejo CA” @0:44 (middle panel) |
 | Rapper strip · card 04 | 7mh39MPtp_A NorthStar Studio, Vallejo @0:24 |
