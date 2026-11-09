@@ -207,7 +207,7 @@ p{margin:0 0 1em}
 .check input{width:20px;height:20px;margin:.05rem 0 0;accent-color:var(--gold);flex:none}
 .hp{position:absolute!important;left:-9999px}
 .status{min-height:1.4em;font-size:.92rem;margin:0}
-.status[data-state=ok]{color:#d9f2c6}
+.status[data-state=ok]{color:#ffc58f}
 .status[data-state=err]{color:#ffd0c9}
 .status[data-state=busy]{color:var(--ink-2)}
 .form button[disabled]{opacity:.6;cursor:progress}
