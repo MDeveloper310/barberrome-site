@@ -154,8 +154,7 @@ def og():
     big = ImageFont.truetype(str(FONT / "barlow-condensed-800.woff2"), 120)
     sm = ImageFont.truetype(str(FONT / "barlow-condensed-600.woff2"), 28)
     d.text((56, 180), "BARBER", font=big, fill=(243, 240, 234))
-    d.text((56, 284), "ROME", font=big, fill=(243, 240, 234))
-    d.text((56, 284), "R", font=big, fill=ACCENT)
+    d.text((56, 284), "ROME", font=big, fill=ACCENT)                       # whole ROME orange
     d.rectangle([56, 430, 92, 434], fill=ACCENT)
     x = 104; d.text((x, 414), "BAY AREA RAP  ·  SF", font=sm, fill=(210, 205, 196))
     x += d.textlength("BAY AREA RAP  ·  SF", font=sm) + 10                 # draw the arrow (font has no →)

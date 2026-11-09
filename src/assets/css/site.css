@@ -70,8 +70,7 @@ p{margin:0 0 1em}
 .hero__cap::before{content:"";width:7px;height:7px;border-radius:50%;background:var(--red)}
 .wordmark{font-size:clamp(5.2rem,29vw,11rem);line-height:.8;letter-spacing:-.01em;margin:.15em 0 .12em;text-shadow:0 2px 30px rgba(0,0,0,.35)}
 .wordmark span{display:block}
-.wordmark .rome{color:var(--ink);-webkit-text-stroke:0}
-.wordmark .rome::first-letter{color:var(--gold)}
+.wordmark .rome{color:var(--gold);-webkit-text-stroke:0}  /* whole ROME in the accent orange (owner request, Nov 9 2026) */
 .ident{display:flex;flex-wrap:wrap;gap:.35rem .9rem;font:600 1.05rem/1.2 var(--head);letter-spacing:.14em;text-transform:uppercase;color:var(--ink-2);margin:0 0 1.2rem;padding:0;list-style:none}
 .ident li{display:flex;align-items:center;gap:.9rem}
 .ident li+li::before{content:"";width:5px;height:5px;background:var(--gold);transform:rotate(45deg)}

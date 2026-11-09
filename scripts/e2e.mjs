@@ -151,6 +151,13 @@ for (const [w2, h2] of [[360, 640], [390, 664]]) {
   ok(!(await ev("document.querySelector('[data-bgm]').classList.contains('is-tucked')")), `bgm ${w2}x${h2}: player comes back once the buttons scroll past`);
 }
 
+// wordmark colours as rendered
+{
+  await go(BASE + "/", { width: 390, height: 844 });
+  const c = await ev(`(()=>{const g=(s)=>getComputedStyle(document.querySelector(s)).color;const r=document.querySelector('.wordmark .rome');return {rome:g('.wordmark .rome'),barber:g('.wordmark span:first-child'),mark:g('.mark b'),txt:r.textContent}})()`);
+  ok(c.rome === "rgb(232, 134, 42)" && c.mark === "rgb(232, 134, 42)" && c.barber !== c.rome && /rome/i.test(c.txt), `wordmark: ROME orange (${c.rome}), BARBER ${c.barber}`);
+}
+
 // a video play pauses the loop
 await go(BASE + "/", { width: 390, height: 844 });
 { const p0 = await ev("(()=>{const r=document.querySelector('#about p').getBoundingClientRect();return [r.left+20,r.top+10]})()"); await tap(p0[0], p0[1]); }

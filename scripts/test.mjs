@@ -182,6 +182,13 @@ for (const f of [...walk(path.join(ROOT, "src")), ...walk(path.join(ROOT, "scrip
   ok(SITE_URL.startsWith("https:") || !/og:image:secure_url/.test(home), "home: no https secure_url advertised while the site runs on http");
 }
 
+// wordmark: whole ROME orange, BARBER off-white
+{
+  const css = fs.readFileSync(path.join(DIST, "assets/css/site.css"), "utf8");
+  ok(/\.wordmark \.rome\{color:var\(--gold\)/.test(css) && !/\.rome::first-letter/.test(css) && /--gold:#e8862a/.test(css), "css: whole ROME in the hero wordmark is #e8862a (no first-letter-only rule)");
+  ok(/\.mark b\{color:var\(--gold\)/.test(css) && /<a class="mark"[^>]*>Barber<b>Rome<\/b><\/a>/.test(home), "nav logo: ROME orange");
+}
+
 // background music loop (home)
 {
   const a = (home.match(/<audio[^>]*data-bgm-audio[^>]*>/) || [""])[0];
