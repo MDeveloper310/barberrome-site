@@ -116,9 +116,9 @@ Every site image is a hand-picked frame (no YouTube thumbnails), letterbox/sideb
 |---|---|
 | hero wide · DOMINAMOR tile + poster | qIjw-tHmnQU “California livin’” @0:12 |
 | TOP DOWN tile · BAY PLAY poster | qIjw-tHmnQU “California livin’” @0:55 |
-| hero mobile (under 700px wide) | qIjw-tHmnQU California livin’ @0:12 (same still as desktop; car framed above the headline) |
+| hero mobile (under 700px wide) | photo supplied by owner — `source-media/owner/og-photo__supplied-by-owner.jpg`, crouched by the convertible (Nov 9, 2026) |
 | FUNKY FLOW tile | 4G-7JNXefeg ALL I KNOW @1:39 |
-| share image (og-barberrome, home + default) | qIjw-tHmnQU California livin’ @0:12, car only. The owner’s crouch photo (`source-media/owner/og-photo__supplied-by-owner.jpg`, supplied by owner Nov 8, 2026) is kept but not used right now |
+| share image (og-barberrome, home + default) | photo supplied by owner — `source-media/owner/og-photo__supplied-by-owner.jpg` (Nov 8, 2026) |
 | home background loop (`assets/audio/rome-show.m4a`, shown as “Show Mix” (owner’s original file title “Rome Show 8-16-2026”)) | audio supplied by owner — original kept at `source-media/owner/rome-show-8-16-2026__supplied-by-owner.m4a` (Nov 8, 2026). Web copy: AAC 128 kbps stereo, −4.5 dB + limiter (original clipped), 11.1 MB, 11:00 |
 | FUNKY FLOW poster | 4G-7JNXefeg ALL I KNOW @1:21 |
 | TOP DOWN poster · card 03 | DpbIpMfDxnQ TOP DOWN shoot @1:17 |

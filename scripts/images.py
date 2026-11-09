@@ -26,13 +26,14 @@ F_CAR  = "hero-wide__qIjw-tHmnQU_0m12s.jpg"         # black 5.0 convertible, gol
 F_DRV  = "driver-car__qIjw-tHmnQU_0m55s.jpg"        # driver, top down, red leather (California livin')
 F_PW20 = "playah-way__ryC7cK5mD_8_0m20s.jpg"        # PLAYAH WAY, mural + Jungle Life sign, wide
 F_PW36 = "playah-way__ryC7cK5mD_8_0m36s.jpg"        # PLAYAH WAY, SF-cap man close, friend behind
+F_CROUCH = ROOT / "source-media" / "owner" / "og-photo__supplied-by-owner.jpg"  # owner photo (1536x2048): crouched by the convertible
 F_ASTRO= "top-down-mood__DpbIpMfDxnQ_1m17s.jpg"     # TOP DOWN Astro shoot, back to camera, light tubes
 
 # name: dict(src, box=(l,t,r,b) in the 1920x1080 frame, widths, fade=bottom darkening 0..1,
 #            tag=small source label or None, ratio check only for sanity)
 JOBS = {
     "hero-wide":       dict(src=F_CAR,  box=(0, 0, 1920, 1080),   widths=[640, 960, 1280, 1920], fade=0.0,  tag=None, exposure=0.86),
-    "hero-tall":       dict(src=F_CAR,  box=(40, 240, 1462, 2640), widths=[480, 640],     fade=0.0,  tag=None, exposure=0.90),  # phone hero: same car still as desktop (headlight, wheel, 5.0), car in the top band above the text
+    "hero-tall":       dict(src=F_CROUCH, box=(466, 540, 1414, 2140), widths=[480, 640],    fade=0.0,  tag=None, exposure=0.96),  # mobile hero: owner's crouch photo
     "tile-top-down":   dict(src=F_DRV,  box=(180, 0, 1260, 1080), widths=[360, 720],             fade=0.55, tag="STILL · CALIFORNIA LIVIN'"),
     "tile-playah-way": dict(src=F_PW36, box=(840, 0, 1920, 1080), widths=[360, 720],             fade=0.55, tag="PLAYAH WAY · VIDEO"),
     "tile-funky-flow": dict(src=F_ART,  box=(260, 0, 1340, 1080), widths=[360, 720],             fade=0.55, tag="STILL · ALL I KNOW VIDEO"),
@@ -142,17 +143,18 @@ def build(name, j):
 F_OWNER = ROOT / "source-media" / "owner" / "og-photo__supplied-by-owner.jpg"   # photo supplied by owner (Nov 8, 2026)
 
 def og():
-    """Share card 1200x630: the California livin' car still (same as the desktop hero, car only) on the right,
-    feathered into a blurred, darkened copy of itself; BARBER ROME wordmark on the left, clear of the car.
-    (The owner's crouch photo, F_OWNER, is kept in source-media/owner/ but no longer used.)"""
+    """Share card 1200x630: the owner's photo (cropped, not stretched) on the right, feathered into a blurred,
+    darkened copy of itself; BARBER ROME wordmark on the left, clear of his face."""
     from PIL import ImageFilter, ImageEnhance
     W, H = 1200, 630
-    im = Image.open(SRC / F_CAR).convert("RGB")
-    bg = im.resize((round(im.width * H / im.height), H), Image.LANCZOS).crop((0, 0, W, H)).filter(ImageFilter.GaussianBlur(28))
-    bg = ImageEnhance.Brightness(bg).enhance(0.34)
-    # headlight, front wheel, 5.0 badge, door and most of the rear wheel; the plate corner is left out
-    fg = grade(im.crop((250, 40, 1650, 1070)), exposure=0.92).resize((856, H), Image.LANCZOS)
-    mask = Image.linear_gradient("L").rotate(90).resize((150, H))          # soft left edge into the blur
+    im = Image.open(F_OWNER).convert("RGB")
+    bg = im.resize((W, round(im.height * W / im.width)), Image.LANCZOS)
+    top = max(0, (bg.height - H) // 2)
+    bg = bg.crop((0, top, W, top + H)).filter(ImageFilter.GaussianBlur(28))
+    bg = ImageEnhance.Brightness(bg).enhance(0.38)
+    # crop chosen by eye: cap/face, chain, the gold-center wire wheel and his shoes all stay in frame
+    fg = im.crop((100, 435, 1536, 1640)).resize((750, H), Image.LANCZOS)
+    mask = Image.linear_gradient("L").rotate(90).resize((140, H))          # soft left edge into the blur
     m = Image.new("L", fg.size, 255); m.paste(mask, (0, 0))
     bg.paste(fg, (W - fg.width, 0), m)
     d = ImageDraw.Draw(bg)
@@ -167,6 +169,7 @@ def og():
     d.text((x + 40, 414), "VALLEJO", font=sm, fill=(210, 205, 196))
     bg.save(OUT / "og-barberrome.jpg", "JPEG", quality=86, optimize=True, progressive=True)
     return bg
+
 
 if __name__ == "__main__":
     done = {n: build(n, j) for n, j in JOBS.items()}

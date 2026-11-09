@@ -182,8 +182,8 @@ for (const f of [...walk(path.join(ROOT, "src")), ...walk(path.join(ROOT, "scrip
   ok(SITE_URL.startsWith("https:") || !/og:image:secure_url/.test(home), "home: no https secure_url advertised while the site runs on http");
 }
 
-// hero: both breakpoints use the California livin' car still; caption says so
-ok(/<span class="cap-tall">Still from the “California livin’” video<\/span>/.test(home) && /<span class="cap-wide">Still from the “California livin’” video<\/span>/.test(home), "hero: mobile + desktop captions credit the California livin' still");
+// hero: desktop = California livin' car; mobile = owner crouch photo
+ok(/<span class="cap-wide">Still from the “California livin’” video<\/span>/.test(home) && /<span class="cap-tall">Photo supplied by BarberRome<\/span>/.test(home), "hero: desktop credits California livin'; mobile credits owner photo");
 
 // wordmark: whole ROME orange, BARBER off-white
 {
