@@ -182,6 +182,9 @@ for (const f of [...walk(path.join(ROOT, "src")), ...walk(path.join(ROOT, "scrip
   ok(SITE_URL.startsWith("https:") || !/og:image:secure_url/.test(home), "home: no https secure_url advertised while the site runs on http");
 }
 
+// hero: both breakpoints use the California livin' car still; caption says so
+ok(/<span class="cap-tall">Still from the “California livin’” video<\/span>/.test(home) && /<span class="cap-wide">Still from the “California livin’” video<\/span>/.test(home), "hero: mobile + desktop captions credit the California livin' still");
+
 // wordmark: whole ROME orange, BARBER off-white
 {
   const css = fs.readFileSync(path.join(DIST, "assets/css/site.css"), "utf8");
