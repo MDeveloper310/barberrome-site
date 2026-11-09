@@ -116,7 +116,8 @@ Every site image is a hand-picked frame (no YouTube thumbnails), letterbox/sideb
 |---|---|
 | hero wide · DOMINAMOR tile + poster | qIjw-tHmnQU “California livin’” @0:12 |
 | TOP DOWN tile · BAY PLAY poster | qIjw-tHmnQU “California livin’” @0:55 |
-| hero mobile · OG · FUNKY FLOW tile | 4G-7JNXefeg ALL I KNOW @1:39 |
+| hero mobile · FUNKY FLOW tile | 4G-7JNXefeg ALL I KNOW @1:39 |
+| share image (og-barberrome, home + default) | photo supplied by owner — `source-media/owner/og-photo__supplied-by-owner.jpg` (Nov 8, 2026) |
 | FUNKY FLOW poster | 4G-7JNXefeg ALL I KNOW @1:21 |
 | TOP DOWN poster · card 03 | DpbIpMfDxnQ TOP DOWN shoot @1:17 |
 | PLAYAH WAY tile | ryC7cK5mD_8 PLAYAH WAY @0:36 |

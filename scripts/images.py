@@ -125,23 +125,36 @@ def build(name, j):
         save(r, name, w)
     return im
 
+F_OWNER = ROOT / "source-media" / "owner" / "og-photo__supplied-by-owner.jpg"   # photo supplied by owner (Nov 8, 2026)
+
 def og():
-    im = Image.open(SRC / F_ART).convert("RGB").crop((0, 36, 1920, 1044)).resize((1200, 630), Image.LANCZOS)
-    im = grade(im, exposure=0.86)
-    a = np.asarray(im).astype(np.float32)
-    x = np.linspace(0, 1, 1200)[None, :, None]
-    a *= 1 - 0.78 * np.clip((x - 0.42) / 0.30, 0, 1)                 # darken right side for type
-    im = Image.fromarray(np.clip(a, 0, 255).astype(np.uint8))
-    d = ImageDraw.Draw(im)
+    """Share card 1200x630: the owner's photo (cropped, not stretched) on the right, feathered into a blurred,
+    darkened copy of itself; BARBER ROME wordmark on the left, clear of his face."""
+    from PIL import ImageFilter, ImageEnhance
+    W, H = 1200, 630
+    im = Image.open(F_OWNER).convert("RGB")
+    bg = im.resize((W, round(im.height * W / im.width)), Image.LANCZOS)
+    top = max(0, (bg.height - H) // 2)
+    bg = bg.crop((0, top, W, top + H)).filter(ImageFilter.GaussianBlur(28))
+    bg = ImageEnhance.Brightness(bg).enhance(0.38)
+    # crop chosen by eye: cap/face, chain, the gold-center wire wheel and his shoes all stay in frame
+    fg = im.crop((100, 435, 1536, 1640)).resize((750, H), Image.LANCZOS)
+    mask = Image.linear_gradient("L").rotate(90).resize((140, H))          # soft left edge into the blur
+    m = Image.new("L", fg.size, 255); m.paste(mask, (0, 0))
+    bg.paste(fg, (W - fg.width, 0), m)
+    d = ImageDraw.Draw(bg)
     big = ImageFont.truetype(str(FONT / "barlow-condensed-800.woff2"), 120)
-    sm = ImageFont.truetype(str(FONT / "barlow-condensed-600.woff2"), 30)
-    d.text((660, 300), "BARBER", font=big, fill=(243, 240, 234))
-    d.text((660, 400), "ROME", font=big, fill=(243, 240, 234))
-    d.text((660, 400), "R", font=big, fill=ACCENT)
-    d.rectangle([660, 540, 700, 544], fill=ACCENT)
-    d.text((712, 523), "BAY AREA RAP  ·  SF → VALLEJO", font=sm, fill=(210, 205, 196))
-    im.save(OUT / "og-barberrome.jpg", "JPEG", quality=84, optimize=True, progressive=True)
-    return im
+    sm = ImageFont.truetype(str(FONT / "barlow-condensed-600.woff2"), 28)
+    d.text((56, 180), "BARBER", font=big, fill=(243, 240, 234))
+    d.text((56, 284), "ROME", font=big, fill=(243, 240, 234))
+    d.text((56, 284), "R", font=big, fill=ACCENT)
+    d.rectangle([56, 430, 92, 434], fill=ACCENT)
+    x = 104; d.text((x, 414), "BAY AREA RAP  ·  SF", font=sm, fill=(210, 205, 196))
+    x += d.textlength("BAY AREA RAP  ·  SF", font=sm) + 10                 # draw the arrow (font has no →)
+    d.line([(x, 432), (x + 22, 432)], fill=ACCENT, width=3); d.polygon([(x + 22, 426), (x + 30, 432), (x + 22, 438)], fill=ACCENT)
+    d.text((x + 40, 414), "VALLEJO", font=sm, fill=(210, 205, 196))
+    bg.save(OUT / "og-barberrome.jpg", "JPEG", quality=86, optimize=True, progressive=True)
+    return bg
 
 if __name__ == "__main__":
     done = {n: build(n, j) for n, j in JOBS.items()}

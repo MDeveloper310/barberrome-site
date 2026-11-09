@@ -161,7 +161,7 @@ function bookingForm() {
 // ---- layout ------------------------------------------------------------------
 function layout({ pathName, title, description, body, ogImage, ogType = "website", jsonld = [], noindex = false, preload = "", active = "" }) {
   const canonical = abs(pathName);
-  const img = ogImage || { url: "/assets/img/og-barberrome.jpg", w: 1200, h: 630, alt: "A man in an SF cap, sunglasses and a black track jacket sits above red-tile rooftops, next to the BARBER ROME wordmark." };
+  const img = ogImage || { url: "/assets/img/og-barberrome.jpg", w: 1200, h: 630, alt: "BarberRome beside the 5.0 convertible" };
   const cfg = {
     formsMode: FORMS, basePath: B, joinFunction: site.forms.joinFunction, bookingFunction: site.forms.bookingFunction,
     rewardUrl: site.reward.url, rewardLabel: site.reward.label, instagramHandle: L.instagramHandle
