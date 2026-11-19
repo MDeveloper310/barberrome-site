@@ -206,6 +206,7 @@ ok(/og:image:alt" content="BarberRome beside the 5.0 convertible"/.test(home), "
   const v = (home.match(/<video data-gt-video[^>]*>/) || [""])[0];
   ok(/\scontrols\b/.test(v) && /playsinline/.test(v) && /preload="metadata"/.test(v) && !/\sautoplay\b/.test(v) && /poster="[^"]*\/assets\/img\/game-tight-poster\.jpg\?v=[0-9a-f]{8}"/.test(v) && /aria-label="Game Tight intro video by BarberRome \(0:59\)"/.test(v), "video: controls, playsinline, poster, labelled, no markup autoplay");
   ok(/<source src="[^"]*\/assets\/video\/game-tight\.mp4\?v=[0-9a-f]{8}" type="video\/mp4">/.test(home), "video: cache-busted MP4 source");
+  ok(/<p class="gt__drop"><span class="gt__date">Game Tight drops 11\/27\.<\/span> <span class="gt__credit">BarberRome ft\. Primo Leone &amp; LT<\/span><\/p>/.test(home) && !/starts when you scroll/.test(home) && !/datePublished/.test(home.slice(home.indexOf('"VideoObject"'), home.indexOf('"VideoObject"') + 600)), "video: release line (drops 11/27, ft. Primo Leone & LT), no autoplay blurb, no guessed date");
   ok(/data-gt-sound hidden aria-label="Turn on sound for the Game Tight intro"/.test(home) && /<figcaption>Game Tight intro · 0:59<\/figcaption>/.test(home), "video: tap-for-sound button + caption");
   const mp4 = path.join(DIST, "assets/video/game-tight.mp4");
   ok(fs.existsSync(mp4) && fs.statSync(mp4).size < 25e6, `video: MP4 shipped and under 25 MB (${fs.existsSync(mp4) ? (fs.statSync(mp4).size / 1e6).toFixed(1) : "?"} MB)`);

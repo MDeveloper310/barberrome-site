@@ -223,6 +223,8 @@ ok(started && await ev("document.querySelector('[data-bgm-audio]').paused && loc
     await away(); s = await st();
     ok(!s.v && !s.a, `intro ${w2}px: mix that never started stays off after the intro`);
   }
+  await go(BASE + "/", { width: 390, height: 844 });
+  ok(await ev("(()=>{const p=document.querySelector('.gt__drop');const r=p.getBoundingClientRect();return p.querySelector('.gt__credit').innerText.trim()==='BarberRome ft. Primo Leone & LT' && p.textContent.replace(/\\s+/g,' ').trim()==='Game Tight drops 11/27. BarberRome ft. Primo Leone & LT' && r.right<=innerWidth})()"), "intro: release line shown under the heading (credit as written), fits at 390px");
   // reduced motion: no autoplay, controls still work
   await send("Emulation.setEmulatedMedia", { features: [{ name: "prefers-reduced-motion", value: "reduce" }] });
   await go(BASE + "/", { width: 390, height: 844 }); await intoView();

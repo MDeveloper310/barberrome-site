@@ -382,7 +382,7 @@ function gameTight() {
     <div class="gt__head">
       <p class="eyebrow">Intro</p>
       <h2 id="gt-h">Game Tight</h2>
-      <p class="muted">The Game Tight intro. It starts when you scroll to it. The Show Mix pauses while it plays and comes back after.</p>
+      <p class="gt__drop"><span class="gt__date">Game Tight drops 11/27.</span> <span class="gt__credit">BarberRome ft. Primo Leone &amp; LT</span></p>
     </div>
     <figure class="gt__fig" data-gt>
       <div class="gt__frame">
