@@ -292,6 +292,7 @@
     function set(k, v) { try { v === null ? localStorage.removeItem(k) : localStorage.setItem(k, v); } catch (e) {} }
     var GESTURES = ["pointerup", "pointerdown", "mousedown", "touchend", "keydown", "click"];
     var armed = false, yielded = false;
+    var held = false, resumeAfter = false; // Game Tight handoff: mix paused for the intro video, resume after if it was on
     function ui() {
       var on = !audio.paused;
       box.classList.toggle("is-playing", on);
@@ -310,7 +311,8 @@
     function onGesture(e) {
       if (e.type === "keydown" && e.key === "Escape") return;
       if (box.contains(e.target)) { disarm(); return; }            // the player's own buttons handle themselves
-      if (e.target.closest && e.target.closest("[data-play],[data-facade],[data-expand],iframe,video")) { disarm(); return; } // they're starting a video
+      if (e.target.closest && e.target.closest("[data-play],[data-facade],[data-expand],[data-gt],iframe,video")) { if (!held) disarm(); return; } // they're starting a video
+      if (held) { if (get(KEY) !== "paused") { resumeAfter = true; disarm(); } return; } // intro is playing: start the mix after it, not over it
       if (get(KEY) === "paused") { disarm(); return; }
       start().then(function () { disarm(); track("bgm_start", { via: "gesture" }); }).catch(function () {});
     }
@@ -323,18 +325,38 @@
     audio.addEventListener("ended", function () { audio.currentTime = 0; start().catch(function () {}); }); // belt-and-braces for loop
     toggle.addEventListener("click", function () {
       yielded = false;
+      if (audio.paused && held) { held = false; resumeAfter = false; try { d.dispatchEvent(new CustomEvent("br:bgm-userplay")); } catch (e) {} } // they chose the mix over the intro video
+      else if (!audio.paused && held) { resumeAfter = false; }
       if (audio.paused) { set(KEY, null); disarm(); start().then(function () { track("bgm_start", { via: "button" }); }).catch(ui); }
       else { audio.pause(); set(KEY, "paused"); disarm(); track("bgm_pause", {}); }
     });
     mute.addEventListener("click", function () { audio.muted = !audio.muted; set(MKEY, audio.muted ? "1" : null); });
     // pause (without remembering it) when a video starts
-    BGM = { yield: function () { if (!audio.paused) { yielded = true; audio.pause(); } disarm(); } };
+    BGM = {
+      yield: function () { if (!audio.paused) { yielded = true; audio.pause(); } disarm(); },
+      // hold/release: the Game Tight intro takes over while it plays, then hands the mix back only if it was on before
+      hold: function () {
+        if (held) return; held = true;
+        resumeAfter = !audio.paused;
+        if (resumeAfter) { yielded = true; audio.pause(); }
+        ui();
+      },
+      release: function () {
+        if (!held) return; held = false;
+        var again = resumeAfter; resumeAfter = false;
+        if (again && get(KEY) !== "paused") {
+          yielded = false;
+          start().then(function () { track("bgm_start", { via: "after_intro" }); }).catch(function () { arm(); ui(); });
+        } else ui();
+      },
+      isHeld: function () { return held; }
+    };
     d.addEventListener("click", function (e) {
       if (e.target.closest && e.target.closest("[data-play],[data-facade]")) BGM.yield();
     }, true);
     // tuck away while typing on small screens so it never covers a field or submit button
     // never sit on top of a button or form field: slide out of the way while one is under it (or while typing on a phone)
-    var AVOID = ".ctas .btn, [data-player-root] [data-play], form input, form textarea, form select, form button";
+    var AVOID = ".ctas .btn, [data-player-root] [data-play], [data-gt] .gt__frame, form input, form textarea, form select, form button";
     var typing = false, raf = 0;
     function place() {
       raf = 0;
@@ -352,6 +374,57 @@
     ui();
     if (get(KEY) === "paused") return;              // they paused it before: leave it alone
     start().then(function () { track("bgm_start", { via: "autoplay" }); }).catch(function () { arm(); ui(); });
+  })();
+
+  /* ---------- Game Tight intro video (home, under the bio) ----------
+     Scrolled into view -> pause the Show Mix and play the intro (with sound if the browser allows it; browsers
+     only allow sound after the visitor has tapped/clicked the page, so otherwise it plays muted with a
+     "Tap for sound" button). Finished, or scrolled out of view -> pause it and hand the Show Mix back, but only
+     if the mix was playing before. Reduced motion: no autoplay; the native controls still work. */
+  (function () {
+    var fig = d.querySelector("[data-gt]"); if (!fig) return;
+    var v = fig.querySelector("[data-gt-video]"), snd = fig.querySelector("[data-gt-sound]");
+    var reduce = w.matchMedia && w.matchMedia("(prefers-reduced-motion: reduce)").matches;
+    var inView = false, done = false, userPaused = false, ours = false;
+    function soundUI() { snd.hidden = !(v.muted && !v.paused); }
+    function autoplay() {
+      ours = true;
+      v.muted = false;
+      var p; try { p = v.play(); } catch (e) { p = Promise.reject(e); }
+      return Promise.resolve(p).catch(function () {        // sound refused (no gesture yet): play muted instead
+        v.muted = true;
+        return v.play();
+      }).then(function () { track("intro_play", { sound: !v.muted, via: "scroll" }); })
+        .catch(function () { ours = false; soundUI(); });  // even muted autoplay refused: leave the poster + controls
+    }
+    function stop() { if (!v.paused) { ours = true; v.pause(); } }
+    v.addEventListener("play", function () { if (BGM) BGM.hold(); soundUI(); });
+    v.addEventListener("playing", function () { ours = false; });
+    v.addEventListener("pause", function () {
+      if (!v.ended && inView && !ours) userPaused = true;   // they paused it with the controls: don't fight them
+      ours = false;
+      if (BGM) BGM.release(); soundUI();
+    });
+    v.addEventListener("ended", function () { done = true; if (BGM) BGM.release(); soundUI(); track("intro_end", {}); });
+    v.addEventListener("volumechange", soundUI);
+    snd.addEventListener("click", function () {
+      v.muted = false;
+      if (v.paused) v.play().catch(function () {});
+      soundUI(); track("intro_sound_on", {});
+    });
+    d.addEventListener("br:bgm-userplay", function () { userPaused = true; stop(); });
+    w.brIntro = { video: v, state: function () { return { inView: inView, done: done, userPaused: userPaused }; } }; // for tests/debug
+    if (!("IntersectionObserver" in w)) return;               // old browsers: plain video with controls
+    new IntersectionObserver(function (entries) {
+      var r = entries[entries.length - 1].intersectionRatio;
+      if (r >= 0.5 && !inView) {
+        inView = true;
+        if (!done && !userPaused && !reduce) autoplay();
+      } else if (r < 0.2 && inView) {
+        inView = false; done = false; userPaused = false;   // next visit plays it again
+        stop();
+      }
+    }, { threshold: [0, 0.2, 0.5, 0.75] }).observe(v);
   })();
 
   /* ---------- chair-to-mic rail controls ---------- */

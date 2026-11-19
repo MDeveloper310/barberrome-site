@@ -121,9 +121,9 @@ for (const [w2, h2] of [[390, 844], [1440, 900]]) {
   await ev("localStorage.clear()"); await go(BASE + "/", { width: w2, height: h2 });
   const st = await ev(`(()=>{const a=document.querySelector('[data-bgm-audio]'),b=document.querySelector('[data-bgm]').getBoundingClientRect();return {loop:a.loop,paused:a.paused,label:document.querySelector('[data-bgm-status]').textContent,inView:b.left>=0&&b.right<=innerWidth&&b.bottom<=innerHeight}})()`);
   ok(st.loop && st.paused && st.label === "Tap to play" && st.inView, `bgm ${w2}px: loop set, blocked autoplay waits for a tap, player on screen`);
-  await ev("scrollTo(0, 1400)"); await sleep(400);
+  await ev("document.querySelector('#music').scrollIntoView()"); await sleep(400);   // past the Game Tight intro (it holds the mix while it plays)
   ok(await ev("document.querySelector('[data-bgm-audio]').paused"), `bgm ${w2}px: scrolling alone does not start it`);
-  const p0 = await ev("(()=>{const r=document.querySelector('#about p').getBoundingClientRect();return [r.left+20,r.top+10]})()");
+  const p0 = await ev("(()=>{const r=document.querySelector('#music .sec__head p').getBoundingClientRect();return [r.left+20,r.top+10]})()");
   await tap(p0[0], p0[1]);
   const st2 = await ev("(()=>{const a=document.querySelector('[data-bgm-audio]');return {paused:a.paused,label:document.querySelector('[data-bgm-status]').textContent,pressed:document.querySelector('[data-bgm-toggle]').getAttribute('aria-pressed')}})()");
   ok(!st2.paused && st2.label === "Now playing" && st2.pressed === "true", `bgm ${w2}px: first tap starts the loop`);
@@ -152,11 +152,15 @@ for (const [w2, h2] of [[360, 640], [390, 664]]) {
   ok(!(await ev("document.querySelector('[data-bgm]').classList.contains('is-tucked')")), `bgm ${w2}x${h2}: player comes back once the buttons scroll past`);
 }
 
-// wordmark colours as rendered
-{
-  await go(BASE + "/", { width: 390, height: 844 });
-  const c = await ev(`(()=>{const g=(s)=>getComputedStyle(document.querySelector(s)).color;const r=document.querySelector('.wordmark .rome');return {rome:g('.wordmark .rome'),barber:g('.wordmark span:first-child'),mark:g('.mark b'),txt:r.textContent}})()`);
-  ok(c.rome === "rgb(232, 134, 42)" && c.mark === "rgb(232, 134, 42)" && c.barber !== c.rome && /rome/i.test(c.txt), `wordmark: ROME orange (${c.rome}), BARBER ${c.barber}`);
+// wordmark: black & white, Archivo Expanded, no overflow on small phones
+for (const w2 of [320, 360, 390, 1024, 1440]) {
+  await go(BASE + "/", { width: w2, height: w2 < 700 ? 740 : 900 });
+  await ev("document.fonts.ready.then(()=>1)");
+  const c = await ev(`(()=>{const g=(s,p)=>getComputedStyle(document.querySelector(s))[p||'color'];const h=document.querySelector('.wordmark'),sp=[...h.querySelectorAll('span')].map(s=>{const r=document.createRange();r.selectNodeContents(s);return r.getBoundingClientRect().right});const col=h.parentElement.getBoundingClientRect();return {rome:g('.wordmark .rome'),barber:g('.wordmark span:first-child'),mark:g('.mark b'),font:g('.wordmark','fontFamily'),markFont:g('.mark','fontFamily'),txt:h.textContent,loaded:document.fonts.check('800 40px "Archivo Expanded"'),fit:Math.max(...sp)<=Math.min(innerWidth,col.right)+1,markFit:document.querySelector('.mark').getBoundingClientRect().right<document.querySelector('.top .btn').getBoundingClientRect().left,over:document.documentElement.scrollWidth<=innerWidth+1,bg:getComputedStyle(document.body).backgroundColor,fs:g('.wordmark','fontSize')}})()`);
+  ok(c.rome === c.barber && c.rome === "rgb(255, 255, 255)" && c.mark === "rgb(10, 10, 10)" && c.txt === "BarberROME", `wordmark ${w2}px: BarberROME, ROME same white as Barber on the photo, nav logo black (${c.rome}/${c.mark})`);
+  ok(/Archivo Expanded/.test(c.font) && /Archivo Expanded/.test(c.markFont) && c.loaded, `wordmark ${w2}px: Archivo Expanded loaded (${c.fs})`);
+  ok(c.fit && c.markFit && c.over, `wordmark ${w2}px: wordmark + nav logo fit, no horizontal overflow`);
+  ok(c.bg === "rgb(255, 255, 255)", `theme ${w2}px: white page background`);
 }
 
 // a video play pauses the loop
@@ -165,6 +169,69 @@ await go(BASE + "/", { width: 390, height: 844 });
 const started = !(await ev("document.querySelector('[data-bgm-audio]').paused"));
 await ev("document.querySelector('.hero [data-play]').click()"); await sleep(400);
 ok(started && await ev("document.querySelector('[data-bgm-audio]').paused && localStorage.getItem('br-bgm')===null"), "bgm: starting a video pauses the loop (without saving a pause)");
+
+// Game Tight intro: scroll-in plays it and hands off the Show Mix; done / scrolled past hands it back
+{
+  const V = "document.querySelector('[data-gt-video]')", A = "document.querySelector('[data-bgm-audio]')";
+  const st = () => ev(`(()=>{const v=${V},a=${A};return {v:!v.paused,muted:v.muted,ended:v.ended,a:!a.paused,label:document.querySelector('[data-bgm-status]').textContent,pressed:document.querySelector('[data-bgm-toggle]').getAttribute('aria-pressed'),sound:!document.querySelector('[data-gt-sound]').hidden,saved:localStorage.getItem('br-bgm')}})()`);
+  const intoView = async () => { await ev(`${V}.scrollIntoView({block:'center'})`); await sleep(1800); };
+  const away = async () => { await ev("scrollTo(0,0)"); await sleep(900); };
+  for (const [w2, h2] of [[390, 844], [1440, 900]]) {
+    await go(BASE + "/", { width: w2, height: h2 }); await ev("localStorage.clear()"); await go(BASE + "/", { width: w2, height: h2 });
+    ok(await ev(`${V}.readyState>=1 || new Promise(r=>{${V}.addEventListener('loadedmetadata',()=>r(true));setTimeout(()=>r(false),4000)})`) && Math.round(await ev(`${V}.duration`)) === 59, `intro ${w2}px: video loads, 0:59 long`);
+    // 1) visitor has the mix on (tapped), then scrolls to the intro
+    await ev("document.querySelector('#about').scrollIntoView()"); await sleep(300);
+    const p0 = await ev("(()=>{const r=document.querySelector('#about .bio__lead').getBoundingClientRect();return [r.left+20,r.top+10]})()");
+    await tap(p0[0], p0[1]);
+    let s = await st();
+    ok(s.a && !s.v, `intro ${w2}px: mix on before the intro is in view`);
+    await intoView(); s = await st();
+    ok(s.v && !s.a && s.label === "Paused for video" && s.pressed === "false" && s.saved === null, `intro ${w2}px: scrolled into view -> intro plays, mix paused (UI says so, pause not saved)`);
+    ok(!s.muted && !s.sound, `intro ${w2}px: after a tap the intro plays with sound (muted=${s.muted})`);
+    await away(); s = await st();
+    ok(!s.v && s.a && s.label === "Now playing" && s.pressed === "true", `intro ${w2}px: scrolled past -> intro paused, mix back on`);
+    await intoView(); s = await st();
+    ok(s.v && !s.a, `intro ${w2}px: scrolling back plays it again and pauses the mix`);
+    await ev(`(${V}.currentTime=${V}.duration-0.6, 1)`); await sleep(2000); s = await st();
+    ok(s.ended && !s.v && s.a && s.label === "Now playing", `intro ${w2}px: when it finishes the mix starts again`);
+    await sleep(800); s = await st();
+    ok(!s.v, `intro ${w2}px: finished intro doesn't loop while still in view`);
+    // 2) visitor pauses the intro with its controls -> mix comes back; scroll-in again is not forced
+    await away(); await intoView();
+    await ev(`${V}.pause()`); await sleep(500); s = await st();
+    ok(!s.v && s.a, `intro ${w2}px: pausing the intro (controls) hands the mix back`);
+    // 3) choosing the mix while the intro plays pauses the intro
+    await ev(`${V}.play()`); await sleep(600);
+    await ev("document.querySelector('[data-bgm-toggle]').click()"); await sleep(500); s = await st();
+    ok(!s.v, `intro ${w2}px: Show Mix play button while intro plays -> intro pauses`);
+    // 4) mix switched off -> intro plays, mix stays off afterwards
+    if (s.a) { await ev("document.querySelector('[data-bgm-toggle]').click()"); await sleep(300); }
+    await away(); s = await st();
+    ok(!s.a && s.saved === "paused", `intro ${w2}px: mix paused by the visitor`);
+    await intoView(); s = await st();
+    ok(s.v && !s.a, `intro ${w2}px: intro still plays when the mix is off`);
+    await away(); s = await st();
+    ok(!s.v && !s.a && s.saved === "paused", `intro ${w2}px: mix that was off is not started after the intro`);
+    // 5) brand-new visitor, no tap yet: muted autoplay + tap-for-sound
+    await ev("localStorage.clear()"); await go(BASE + "/", { width: w2, height: h2 });
+    await intoView(); s = await st();
+    ok(s.v && s.muted && s.sound && !s.a, `intro ${w2}px: no tap yet -> plays muted with "Tap for sound", mix not started`);
+    if (w2 === 390) await shot("e2e-intro-mobile"); else await shot("e2e-intro-desktop");
+    const b = await ev("(()=>{const r=document.querySelector('[data-gt-sound]').getBoundingClientRect();return [r.left+r.width/2,r.top+r.height/2]})()");
+    await tap(b[0], b[1]); s = await st();
+    ok(s.v && !s.muted && !s.sound && !s.a, `intro ${w2}px: "Tap for sound" unmutes it (mix not started by that tap)`);
+    await away(); s = await st();
+    ok(!s.v && !s.a, `intro ${w2}px: mix that never started stays off after the intro`);
+  }
+  // reduced motion: no autoplay, controls still work
+  await send("Emulation.setEmulatedMedia", { features: [{ name: "prefers-reduced-motion", value: "reduce" }] });
+  await go(BASE + "/", { width: 390, height: 844 }); await intoView();
+  ok(!(await st()).v, "intro: prefers-reduced-motion -> no autoplay");
+  const c = await ev(`(()=>{const r=${V}.getBoundingClientRect();return [r.left+r.width/2,r.top+r.height/2]})()`);
+  await tap(c[0], c[1]); await sleep(400);
+  ok((await st()).v, "intro: reduced motion still plays when tapped (native controls)");
+  await send("Emulation.setEmulatedMedia", { features: [] });
+}
 
 console.log(`\n${passes} passed, ${fails} failed`);
 ws.close(); chrome.kill();

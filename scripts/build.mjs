@@ -175,7 +175,7 @@ function layout({ pathName, title, description, body, ogImage, ogType = "website
 <title>${esc(title)}</title>
 <meta name="description" content="${esc(description)}">
 <link rel="canonical" href="${canonical}">
-${noindex ? '<meta name="robots" content="noindex, follow">\n' : ""}<meta name="theme-color" content="#171717">
+${noindex ? '<meta name="robots" content="noindex, follow">\n' : ""}<meta name="theme-color" content="#ffffff">
 <meta property="og:site_name" content="BarberRome">
 <meta property="og:type" content="${ogType}">
 <meta property="og:title" content="${esc(title)}">
@@ -193,6 +193,7 @@ ${abs(img.url).startsWith("https:") ? `<meta property="og:image:secure_url" cont
 <meta name="twitter:image" content="${abs(img.url)}">
 <meta name="twitter:image:alt" content="${esc(img.alt)}">
 <link rel="icon" href="${B}/assets/favicon.svg" type="image/svg+xml">
+<link rel="preload" href="${B}/assets/fonts/archivo-expanded-800.woff2" as="font" type="font/woff2" crossorigin>
 <link rel="preload" href="${B}/assets/fonts/barlow-condensed-800.woff2" as="font" type="font/woff2" crossorigin>
 ${preload}<link rel="stylesheet" href="${B}/assets/css/site.css?v=${CSS_V}">
 <script>document.documentElement.className+=" js";window.BR_CONFIG=${JSON.stringify(cfg)};</script>
@@ -203,7 +204,7 @@ ${analytics}
 <a class="skip" href="#main">Skip to content</a>
 <header class="top">
   <div class="wrap top__in">
-    <a class="mark" href="${B}/" aria-label="BarberRome home">Barber<b>Rome</b></a>
+    <a class="mark" href="${B}/" aria-label="BarberRome home">Barber<b>ROME</b></a>
     <nav class="nav" aria-label="Main">
       ${nav.map(([l, h], i) => `<a href="${B}${h}"${i > 1 ? ' class="hide-sm"' : ""}${active === l ? ' aria-current="page"' : ""}>${l}</a>`).join("\n      ")}
     </nav>
@@ -372,6 +373,31 @@ function bgm() {
 </aside>`;
 }
 
+// Game Tight intro (owner's Instagram intro, supplied Nov 18 2026) — sits right under the bio.
+// site.js plays it when scrolled into view and hands the Show Mix off (pause, then resume if it was on).
+const GT = { src: "/assets/video/game-tight.mp4", poster: "/assets/img/game-tight-poster.jpg", title: "Game Tight intro", dur: "0:59", iso: "PT59S" };
+function gameTight() {
+  return `<section class="sec gt" id="game-tight" aria-labelledby="gt-h">
+  <div class="wrap gt__in">
+    <div class="gt__head">
+      <p class="eyebrow">Intro</p>
+      <h2 id="gt-h">Game Tight</h2>
+      <p class="muted">The Game Tight intro. It starts when you scroll to it. The Show Mix pauses while it plays and comes back after.</p>
+    </div>
+    <figure class="gt__fig" data-gt>
+      <div class="gt__frame">
+        <video data-gt-video controls playsinline preload="metadata" width="720" height="1280" poster="${B}${GT.poster}" title="${GT.title} by BarberRome" aria-label="${GT.title} video by BarberRome (${GT.dur})">
+          <source src="${B}${GT.src}" type="video/mp4">
+          <a href="${B}${GT.src}">Watch the ${GT.title} (MP4)</a>
+        </video>
+        <button type="button" class="gt__sound" data-gt-sound hidden aria-label="Turn on sound for the ${GT.title}"><svg viewBox="0 0 24 24" aria-hidden="true"><path fill="currentColor" d="M4 9v6h4l5 4V5L8 9zm12.5 3a4.5 4.5 0 0 0-2.5-4v8a4.5 4.5 0 0 0 2.5-4zM14 3.2v2.1a7 7 0 0 1 0 13.4v2.1a9 9 0 0 0 0-17.6z"/></svg>Tap for sound</button>
+      </div>
+      <figcaption>${GT.title} · ${GT.dur}</figcaption>
+    </figure>
+  </div>
+</section>`;
+}
+
 function home() {
   const preload = `<link rel="preload" as="image" type="image/webp" media="(max-width: 699px)" imagesrcset="${B}/assets/img/hero-tall-480.webp 480w, ${B}/assets/img/hero-tall-640.webp 640w" imagesizes="100vw">
 <link rel="preload" as="image" type="image/webp" media="(min-width: 700px)" imagesrcset="${B}/assets/img/hero-wide-960.webp 960w, ${B}/assets/img/hero-wide-1280.webp 1280w, ${B}/assets/img/hero-wide-1920.webp 1920w" imagesizes="100vw">
@@ -392,7 +418,7 @@ function home() {
     <div class="hero__grid">
       <div>
         <p class="eyebrow">Bay Area hip-hop</p>
-        <h1 class="wordmark" id="h1"><span>Barber</span><span class="rome">Rome</span></h1>
+        <h1 class="wordmark" id="h1"><span>Barber</span><span class="rome">ROME</span></h1>
         <ul class="ident" aria-label="About">
           <li>Barber since 11</li><li>Rapper</li><li>SF <span class="arrow" aria-hidden="true">→</span><span class="visually-hidden">to</span> Vallejo</li>
         </ul>
@@ -421,6 +447,8 @@ function home() {
     </div>
   </div>
 </section>
+
+${gameTight()}
 
 <section class="dual" aria-label="Barber and rapper">
   <div class="dual__item dual__item--chair">
@@ -473,7 +501,7 @@ function home() {
 
 ${bgm()}
 `;
-  return layout({ pathName: "/", title: site.title, description: site.description, body, jsonld: [artistLd], preload });
+  return layout({ pathName: "/", title: site.title, description: site.description, body, jsonld: [artistLd, { "@context": "https://schema.org", "@type": "VideoObject", name: `${GT.title} — BarberRome`, description: "BarberRome's Game Tight intro video.", thumbnailUrl: abs(GT.poster), contentUrl: abs(GT.src), uploadDate: "2026-11-18", duration: GT.iso }], preload });
 }
 
 // ---- track pages ----------------------------------------------------------------
@@ -566,7 +594,7 @@ fs.rmSync(OUT, { recursive: true, force: true });
 // cache-bust images: every /assets/img/<file> reference in HTML gets ?v=<content hash>, so replaced photos
 // with the same file name are re-fetched instead of served from a stale browser/CDN cache.
 const IMG_V = new Map();
-const imgV = (html) => html.replace(/\/assets\/(img|audio)\/([A-Za-z0-9._-]+\.(?:jpg|webp|png|m4a))(?![?\w.])/g, (m, dir, f) => {
+const imgV = (html) => html.replace(/\/assets\/(img|audio|video)\/([A-Za-z0-9._-]+\.(?:jpg|webp|png|m4a|mp4))(?![?\w.])/g, (m, dir, f) => {
   const k = `${dir}/${f}`;
   if (!IMG_V.has(k)) IMG_V.set(k, hashFile(`assets/${k}`));
   return `/assets/${k}?v=${IMG_V.get(k)}`;

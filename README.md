@@ -72,14 +72,14 @@ Other static hosts work for the pages; forms then need `mode: "function"` on a h
 
 Events (`stream_click`, `stream_open`, `play_click`, `tile_expand`, `track_page_open`, `join_cta`, `join_open`, `join_submit`, `booking_submit`, `social_click`) go to `window.dataLayer` and a `br:track` DOM event; add `?debug` to the URL to log them. Paste a provider snippet into `src/partials/analytics.html` if you want one.
 
-SEO: exact title/description from the brief on `/`, per-track titles/descriptions, canonical on every page, OG + Twitter cards (1200×630 still), JSON-LD `MusicGroup` + `Person` (genre, Vallejo + San Francisco, sameAs Instagram/Spotify/Apple Music/Tidal/YouTube/YouTube Music, 5 `MusicRecording`s), per-track `MusicRecording` + `VideoObject` + breadcrumbs, `sitemap.xml`, `robots.txt`, noindex on thank-you/404 pages. Images are WebP + JPEG fallback with `srcset`, lazy below the fold, self-hosted fonts (Barlow Condensed, OFL), ~15 KB JS, ~20 KB CSS.
+SEO: exact title/description from the brief on `/`, per-track titles/descriptions, canonical on every page, OG + Twitter cards (1200×630 still), JSON-LD `MusicGroup` + `Person` (genre, Vallejo + San Francisco, sameAs Instagram/Spotify/Apple Music/Tidal/YouTube/YouTube Music, 5 `MusicRecording`s), per-track `MusicRecording` + `VideoObject` + breadcrumbs, `sitemap.xml`, `robots.txt`, noindex on thank-you/404 pages. Images are WebP + JPEG fallback with `srcset`, lazy below the fold, self-hosted fonts (Barlow Condensed + Archivo Expanded for the BarberROME wordmark, both OFL), ~24 KB JS, ~30 KB CSS.
 
 ## Files
 
 ```
 src/data/site.json      links, SEO strings, reward, forms mode, contact (null = not set)
 src/data/tracks.json    5 tracks: video IDs, Apple links, release dates, credits, optional hook / per-track spotify + tidal (null = artist page), alt text
-src/assets/             css, js, fonts, img (generated), favicon
+src/assets/             css, js, fonts, img (generated), video (Game Tight intro MP4), audio (Show Mix), favicon
 src/partials/analytics.html
 scripts/build.mjs       HTML generator → dist/
 scripts/images.py       crops, grades and compresses source-media/frames/ → src/assets/img/
@@ -137,3 +137,8 @@ User-supplied facts used in copy: from SF, lives in Vallejo, barbering since 11 
 `backgroundAudio` in `src/data/site.json` sets the file and title. The home page has an `<audio loop preload="none">` and a small player in the bottom-right corner.
 Browsers don't allow sound to start by itself, so the script tries to play on load and, if that's refused, starts on the visitor's first tap, click or keypress (scrolling doesn't count).
 Pause and mute choices are saved per visitor (`localStorage` keys `br-bgm`, `br-bgm-muted`), and starting a video pauses the loop. To remove it, delete `backgroundAudio` from site.json.
+
+## Nov 18 2026 update: Game Tight intro, black & white, wordmark font
+- Theme: black & white, predominantly white. Light palette in `:root`; the photo hero, track tiles, join band, mini player and video frames are "dark islands" that redefine the same CSS variables (see the rule right after the box-sizing reset).
+- Wordmark (hero h1 + nav logo) is typed `BarberROME` and set in Archivo at width 125 / weight 800 ("Archivo Expanded", `src/assets/fonts/archivo-expanded-800.woff2`, OFL in `OFL-Archivo.txt`), a free stand-in for the owner's CapCut "DrukWide" (Druk Wide is a commercial Commercial Type font, so it is not self-hosted).
+- Game Tight intro (`src/assets/video/game-tight.mp4`, 720x1280 H.264/AAC, faststart; poster `img/game-tight-poster.jpg`) sits right under the bio. `site.js` uses IntersectionObserver: at 50% in view it pauses the Show Mix (`BGM.hold`) and plays the intro (with sound if the browser allows, otherwise muted with a "Tap for sound" button); when it ends, is paused, or drops below 20% in view, the mix resumes (`BGM.release`) only if it was playing before. Reduced motion: no autoplay. The 133 MB original is not in git (over GitHub's 100 MB limit); see `source-media/owner/game-tight-intro__supplied-by-owner.txt`.

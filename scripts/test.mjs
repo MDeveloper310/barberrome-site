@@ -187,11 +187,32 @@ ok(/<span class="cap-wide">Still from the “California livin’” video<\/span
 ok(/On phones: BarberRome crouching beside his 5.0 convertible/.test(home), "hero img alt names the crouch photo on phones");
 ok(/og:image:alt" content="BarberRome beside the 5.0 convertible"/.test(home), "home: og/twitter alt describes owner crouch photo beside the 5.0");
 
-// wordmark: whole ROME orange, BARBER off-white
+// black & white theme (Nov 18 2026): no orange left, white page, BarberROME wordmark in Archivo Expanded (OFL)
 {
   const css = fs.readFileSync(path.join(DIST, "assets/css/site.css"), "utf8");
-  ok(/\.wordmark \.rome\{color:var\(--gold\)/.test(css) && !/\.rome::first-letter/.test(css) && /--gold:#e8862a/.test(css), "css: whole ROME in the hero wordmark is #e8862a (no first-letter-only rule)");
-  ok(/\.mark b\{color:var\(--gold\)/.test(css) && /<a class="mark"[^>]*>Barber<b>Rome<\/b><\/a>/.test(home), "nav logo: ROME orange");
+  ok(!/e8862a|f4a65a|232, ?134, ?42/i.test(css) && /--bg:#ffffff/.test(css) && /--ink:#0a0a0a/.test(css) && /--gold:#0a0a0a/.test(css), "css: black & white palette, white page, no orange left");
+  ok(/\.wordmark \.rome\{color:var\(--ink\)\}/.test(css) && /\.mark b\{color:inherit/.test(css), "css: ROME same colour as Barber (hero + nav)");
+  ok(/@font-face\{font-family:"Archivo Expanded";font-weight:800;[^}]*archivo-expanded-800\.woff2/.test(css) && /\.wordmark\{font-family:var\(--wm\)/.test(css) && /\.mark\{font:800 [^;]*var\(--wm\)/.test(css) && /--wm:"Archivo Expanded"/.test(css), "css: wordmark + nav logo use the self-hosted Archivo Expanded");
+  ok(fs.existsSync(path.join(DIST, "assets/fonts/archivo-expanded-800.woff2")) && /Open Font License/.test(fs.readFileSync(path.join(DIST, "assets/fonts/OFL-Archivo.txt"), "utf8")), "fonts: Archivo woff2 shipped with its OFL licence");
+  ok(/<h1 class="wordmark" id="h1"><span>Barber<\/span><span class="rome">ROME<\/span><\/h1>/.test(home) && /<a class="mark"[^>]*>Barber<b>ROME<\/b><\/a>/.test(home), "wordmark + nav logo typed BarberROME (owner's casing)");
+  ok(/<meta name="theme-color" content="#ffffff">/.test(home) && /rel="preload" href="[^"]*archivo-expanded-800\.woff2"/.test(home), "home: white theme-color, wordmark font preloaded");
+  ok(!/e8862a|6e1d24/i.test(fs.readFileSync(path.join(DIST, "assets/favicon.svg"), "utf8")), "favicon: black & white");
+}
+
+// Game Tight intro video right under the bio
+{
+  const i1 = home.indexOf('id="about"'), i2 = home.indexOf('id="game-tight"'), i3 = home.indexOf('class="dual"');
+  ok(i1 > 0 && i2 > i1 && i3 > i2, "home: Game Tight section sits right after the bio");
+  const v = (home.match(/<video data-gt-video[^>]*>/) || [""])[0];
+  ok(/\scontrols\b/.test(v) && /playsinline/.test(v) && /preload="metadata"/.test(v) && !/\sautoplay\b/.test(v) && /poster="[^"]*\/assets\/img\/game-tight-poster\.jpg\?v=[0-9a-f]{8}"/.test(v) && /aria-label="Game Tight intro video by BarberRome \(0:59\)"/.test(v), "video: controls, playsinline, poster, labelled, no markup autoplay");
+  ok(/<source src="[^"]*\/assets\/video\/game-tight\.mp4\?v=[0-9a-f]{8}" type="video\/mp4">/.test(home), "video: cache-busted MP4 source");
+  ok(/data-gt-sound hidden aria-label="Turn on sound for the Game Tight intro"/.test(home) && /<figcaption>Game Tight intro · 0:59<\/figcaption>/.test(home), "video: tap-for-sound button + caption");
+  const mp4 = path.join(DIST, "assets/video/game-tight.mp4");
+  ok(fs.existsSync(mp4) && fs.statSync(mp4).size < 25e6, `video: MP4 shipped and under 25 MB (${fs.existsSync(mp4) ? (fs.statSync(mp4).size / 1e6).toFixed(1) : "?"} MB)`);
+  ok(fs.readFileSync(mp4).subarray(0, 64).includes(Buffer.from("moov")) || fs.readFileSync(mp4).subarray(0, 4096).indexOf("moov") >= 0, "video: faststart (moov before mdat)");
+  ok(/"@type":"VideoObject","name":"Game Tight intro — BarberRome"[^<]*"duration":"PT59S"/.test(home), "home: VideoObject JSON-LD for the intro");
+  const js = fs.readFileSync(path.join(DIST, "assets/js/site.js"), "utf8");
+  ok(/IntersectionObserver/.test(js) && /BGM\.hold\(\)/.test(js) && /BGM\.release\(\)/.test(js) && /prefers-reduced-motion/.test(js), "js: intro uses IntersectionObserver + mix hold/release, respects reduced motion");
 }
 
 // background music loop (home)
@@ -213,7 +234,7 @@ ok(/og:image:alt" content="BarberRome beside the 5.0 convertible"/.test(home), "
 
 // page weight budget
 const kb = (f) => fs.statSync(f).size / 1024;
-ok(kb(path.join(DIST, "assets/js/site.js")) < 20, "site.js < 20 KB");
+ok(kb(path.join(DIST, "assets/js/site.js")) < 28, "site.js < 28 KB (uncompressed; ~8 KB gzipped)");
 ok(kb(path.join(DIST, "assets/css/site.css")) < 40, "site.css < 40 KB");
 const heroW = kb(path.join(DIST, "assets/img/hero-tall-640.webp"));
 ok(heroW < 120, `hero mobile webp < 120 KB (${heroW.toFixed(0)} KB)`);
