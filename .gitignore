@@ -6,3 +6,4 @@ dist-draft/
 .netlify/
 .env
 .env.*
+__pycache__/
