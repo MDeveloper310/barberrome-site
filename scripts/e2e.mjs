@@ -157,7 +157,7 @@ for (const w2 of [320, 360, 390, 1024, 1440]) {
   await go(BASE + "/", { width: w2, height: w2 < 700 ? 740 : 900 });
   await ev("document.fonts.ready.then(()=>1)");
   const c = await ev(`(()=>{const g=(s,p)=>getComputedStyle(document.querySelector(s))[p||'color'];const h=document.querySelector('.wordmark'),sp=[...h.querySelectorAll('span')].map(s=>{const r=document.createRange();r.selectNodeContents(s);return r.getBoundingClientRect().right});const col=h.parentElement.getBoundingClientRect();return {rome:g('.wordmark .rome'),barber:g('.wordmark span:first-child'),mark:g('.mark b'),font:g('.wordmark','fontFamily'),markFont:g('.mark','fontFamily'),txt:h.textContent,loaded:document.fonts.check('800 40px "Archivo Expanded"'),fit:Math.max(...sp)<=Math.min(innerWidth,col.right)+1,markFit:document.querySelector('.mark').getBoundingClientRect().right<document.querySelector('.top .btn').getBoundingClientRect().left,over:document.documentElement.scrollWidth<=innerWidth+1,bg:getComputedStyle(document.body).backgroundColor,fs:g('.wordmark','fontSize')}})()`);
-  ok(c.rome === c.barber && c.rome === "rgb(255, 255, 255)" && c.mark === "rgb(10, 10, 10)" && c.txt === "BarberROME", `wordmark ${w2}px: BarberROME, ROME same white as Barber on the photo, nav logo black (${c.rome}/${c.mark})`);
+  ok(c.rome === "rgb(232, 134, 42)" && c.barber === "rgb(255, 255, 255)" && c.mark === "rgb(173, 87, 0)" && c.txt === "BarberROME", `wordmark ${w2}px: BarberROME, whole ROME orange #e8862a on the photo, nav ROME AA orange #ad5700 (${c.rome}/${c.mark})`);
   ok(/Archivo Expanded/.test(c.font) && /Archivo Expanded/.test(c.markFont) && c.loaded, `wordmark ${w2}px: Archivo Expanded loaded (${c.fs})`);
   ok(c.fit && c.markFit && c.over, `wordmark ${w2}px: wordmark + nav logo fit, no horizontal overflow`);
   ok(c.bg === "rgb(255, 255, 255)", `theme ${w2}px: white page background`);
@@ -225,6 +225,8 @@ ok(started && await ev("document.querySelector('[data-bgm-audio]').paused && loc
   }
   await go(BASE + "/", { width: 390, height: 844 });
   ok(await ev("(()=>{const p=document.querySelector('.gt__drop');const r=p.getBoundingClientRect();return p.querySelector('.gt__credit').innerText.trim()==='BarberRome ft. Primo Leone & LT' && p.textContent.replace(/\\s+/g,' ').trim()==='Game Tight drops 11/27. BarberRome ft. Primo Leone & LT' && r.right<=innerWidth})()"), "intro: release line shown under the heading (credit as written), fits at 390px");
+  // orange accents: AA contrast where orange is text on white
+  ok(await ev(`(()=>{const L=(c)=>{const v=c.match(/\\d+/g).slice(0,3).map(x=>{x/=255;return x<=.04045?x/12.92:((x+.055)/1.055)**2.4});return .2126*v[0]+.7152*v[1]+.0722*v[2]};const cr=(a,b)=>(Math.max(L(a),L(b))+.05)/(Math.min(L(a),L(b))+.05);const g=(s)=>getComputedStyle(document.querySelector(s)).color;const W='rgb(255, 255, 255)';return cr(g('#game-tight .eyebrow'),W)>=4.5&&cr(g('.mark b'),W)>=4.5&&cr(g('.gt__date'),W)>=3&&cr(g('.hero .eyebrow'),'rgb(10, 10, 10)')>=4.5&&g('#game-tight .eyebrow')==='rgb(173, 87, 0)'&&g('.hero .eyebrow')==='rgb(232, 134, 42)'&&g('.gt__date')==='rgb(217, 118, 31)'&&getComputedStyle(document.querySelector('.ctas .btn')).backgroundColor===W})()`), "orange accents: eyebrows/logo/date orange with AA contrast; main buttons still white/black");
   // reduced motion: no autoplay, controls still work
   await send("Emulation.setEmulatedMedia", { features: [{ name: "prefers-reduced-motion", value: "reduce" }] });
   await go(BASE + "/", { width: 390, height: 844 }); await intoView();

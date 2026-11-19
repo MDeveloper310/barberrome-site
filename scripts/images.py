@@ -144,7 +144,7 @@ F_OWNER = ROOT / "source-media" / "owner" / "og-photo__supplied-by-owner.jpg"   
 
 def og():
     """Share card 1200x630, black & white (owner request Nov 18, 2026): the owner's photo (cropped, not stretched)
-    on the right, feathered into a white panel; BarberROME wordmark in black on the left, clear of his face.
+    on the right, feathered into a white panel; BarberROME wordmark (ROME orange) on the left, clear of his face.
     Wordmark font: Archivo Expanded ExtraBold (OFL) - free stand-in for the CapCut "DrukWide" look."""
     W, H = 1200, 630
     im = Image.open(F_OWNER).convert("RGB")
@@ -158,12 +158,13 @@ def og():
     big = ImageFont.truetype(str(FONT / "archivo-expanded-800.woff2"), 92)
     sm = ImageFont.truetype(str(FONT / "barlow-condensed-600.woff2"), 28)
     INK, INK2 = (10, 10, 10), (60, 60, 60)
+    ORANGE = (217, 118, 31)   # #d9761f: the site orange (#e8862a) deepened just enough for 3:1 large-text contrast on white
     d.text((56, 190), "Barber", font=big, fill=INK)
-    d.text((56, 292), "ROME", font=big, fill=INK)
-    d.rectangle([56, 430, 92, 434], fill=INK)
+    d.text((56, 292), "ROME", font=big, fill=ORANGE)                       # whole ROME orange (owner request, Nov 18 2026)
+    d.rectangle([56, 430, 92, 434], fill=ORANGE)
     x = 104; d.text((x, 414), "BAY AREA RAP  ·  SF", font=sm, fill=INK2)
     x += d.textlength("BAY AREA RAP  ·  SF", font=sm) + 10                 # draw the arrow (font has no →)
-    d.line([(x, 432), (x + 22, 432)], fill=INK, width=3); d.polygon([(x + 22, 426), (x + 30, 432), (x + 22, 438)], fill=INK)
+    d.line([(x, 432), (x + 22, 432)], fill=ORANGE, width=3); d.polygon([(x + 22, 426), (x + 30, 432), (x + 22, 438)], fill=ORANGE)
     d.text((x + 40, 414), "VALLEJO", font=sm, fill=INK2)
     bg.save(OUT / "og-barberrome.jpg", "JPEG", quality=86, optimize=True, progressive=True)
     return bg

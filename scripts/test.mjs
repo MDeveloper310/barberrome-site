@@ -190,13 +190,14 @@ ok(/og:image:alt" content="BarberRome beside the 5.0 convertible"/.test(home), "
 // black & white theme (Nov 18 2026): no orange left, white page, BarberROME wordmark in Archivo Expanded (OFL)
 {
   const css = fs.readFileSync(path.join(DIST, "assets/css/site.css"), "utf8");
-  ok(!/e8862a|f4a65a|232, ?134, ?42/i.test(css) && /--bg:#ffffff/.test(css) && /--ink:#0a0a0a/.test(css) && /--gold:#0a0a0a/.test(css), "css: black & white palette, white page, no orange left");
-  ok(/\.wordmark \.rome\{color:var\(--ink\)\}/.test(css) && /\.mark b\{color:inherit/.test(css), "css: ROME same colour as Barber (hero + nav)");
+  ok(/--bg:#ffffff/.test(css) && /--ink:#0a0a0a/.test(css) && /--gold:#ad5700; --gold-2:#ad5700; --gold-lg:#d9761f;/.test(css) && /--gold:#e8862a; --gold-2:#f4a65a; --gold-lg:#e8862a;/.test(css), "css: white/black palette with orange accent (#e8862a on black panels, AA #ad5700 / #d9761f on white)");
+  ok(/\.wordmark \.rome\{color:var\(--gold\)\}/.test(css) && /\.mark b\{color:var\(--gold\)/.test(css) && /\.gt__date\{[^}]*color:var\(--gold-lg\)/.test(css), "css: whole ROME orange (hero + nav), release date orange");
+  ok(/\.btn--gold\{--b:var\(--ink\)/.test(css) && /\.btn--solid-gold\{--b:var\(--ink\)/.test(css) && /\.bgm__play\{[^}]*background:#fff/.test(css), "css: main buttons stay black/white (orange is accent only)");
   ok(/@font-face\{font-family:"Archivo Expanded";font-weight:800;[^}]*archivo-expanded-800\.woff2/.test(css) && /\.wordmark\{font-family:var\(--wm\)/.test(css) && /\.mark\{font:800 [^;]*var\(--wm\)/.test(css) && /--wm:"Archivo Expanded"/.test(css), "css: wordmark + nav logo use the self-hosted Archivo Expanded");
   ok(fs.existsSync(path.join(DIST, "assets/fonts/archivo-expanded-800.woff2")) && /Open Font License/.test(fs.readFileSync(path.join(DIST, "assets/fonts/OFL-Archivo.txt"), "utf8")), "fonts: Archivo woff2 shipped with its OFL licence");
   ok(/<h1 class="wordmark" id="h1"><span>Barber<\/span><span class="rome">ROME<\/span><\/h1>/.test(home) && /<a class="mark"[^>]*>Barber<b>ROME<\/b><\/a>/.test(home), "wordmark + nav logo typed BarberROME (owner's casing)");
   ok(/<meta name="theme-color" content="#ffffff">/.test(home) && /rel="preload" href="[^"]*archivo-expanded-800\.woff2"/.test(home), "home: white theme-color, wordmark font preloaded");
-  ok(!/e8862a|6e1d24/i.test(fs.readFileSync(path.join(DIST, "assets/favicon.svg"), "utf8")), "favicon: black & white");
+  ok(/#e8862a/.test(fs.readFileSync(path.join(DIST, "assets/favicon.svg"), "utf8")) && !/6e1d24/.test(fs.readFileSync(path.join(DIST, "assets/favicon.svg"), "utf8")), "favicon: black/white with the orange accent");
 }
 
 // Game Tight intro video right under the bio
